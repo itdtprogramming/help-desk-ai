@@ -1,0 +1,25 @@
+# .NET
+backend/bin/
+backend/obj/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Python
+ai-service/.venv/
+ai-service/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Models (large, fetched at setup time, not committed)
+ai-service/models/
+
+# Env / secrets
+.env
+*.local.json
+appsettings.Local.json
+
+# OS
+.DS_Store
+Thumbs.db
