@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  aiApi,
-  backendApi,
-  getOrCreateDemoUser,
-  type ClassifyResponse,
-  type RetrieveResponse,
-} from '@/api'
+import { aiApi, backendApi, type ClassifyResponse, type RetrieveResponse } from '@/api'
 import { AnalysisResult, AnalysisResultSkeleton } from '@/components/AnalysisResult'
 import { ProblemForm } from '@/components/ProblemForm'
 
@@ -41,9 +35,7 @@ export function Assistant() {
   async function handleEscalate(category: string) {
     setEscalating(true)
     try {
-      const user = await getOrCreateDemoUser()
       const ticket = await backendApi.createTicket({
-        reportedByUserId: user.id,
         problemDescription: problemText,
         category,
       })

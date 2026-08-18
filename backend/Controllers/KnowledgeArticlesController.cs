@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHelpAI.Api.Data;
@@ -6,6 +7,7 @@ using SmartHelpAI.Api.Models;
 namespace SmartHelpAI.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class KnowledgeArticlesController : ControllerBase
 {

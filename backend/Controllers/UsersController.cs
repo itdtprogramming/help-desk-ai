@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,11 @@ namespace SmartHelpAI.Api.Controllers;
 
 public record CreateUserRequest(string FullName, string Email, string Password, int RoleId, string? Department);
 
+// User management (list/create accounts of any role) is an Admin-only
+// capability — self-service registration lives at POST /api/auth/register
+// and always creates a plain "User" account.
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartHelpAI.Api.Models;
 
@@ -7,6 +8,17 @@ namespace SmartHelpAI.Api.Data;
 
 public static class DbSeeder
 {
+    // Fixed demo credentials for the sprint demo — self-registration only ever
+    // creates "User" accounts, so Technician/Admin logins must be seeded.
+    private const string DemoPassword = "Passw0rd!";
+
+    private static readonly (string Email, string FullName, string RoleName)[] DemoAccounts =
+    [
+        ("user@smarthelp.local", "Demo User", "User"),
+        ("tech@smarthelp.local", "Demo Technician", "Technician"),
+        ("admin@smarthelp.local", "Demo Admin", "Admin"),
+    ];
+
     private class KnowledgeArticleSeedRow
     {
         [JsonPropertyName("kb_id")] public string KbId { get; set; } = string.Empty;
@@ -25,6 +37,37 @@ public static class DbSeeder
     }
 
     public static async Task SeedAsync(AppDbContext db, string dataDirectory)
+    {
+        await SeedDemoAccountsAsync(db);
+        await SeedKnowledgeBaseAsync(db, dataDirectory);
+    }
+
+    private static async Task SeedDemoAccountsAsync(AppDbContext db)
+    {
+        var hasher = new PasswordHasher<User>();
+
+        foreach (var (email, fullName, roleName) in DemoAccounts)
+        {
+            if (await db.Users.AnyAsync(u => u.Email == email))
+            {
+                continue;
+            }
+
+            var role = await db.Roles.FirstAsync(r => r.Name == roleName);
+            var user = new User
+            {
+                FullName = fullName,
+                Email = email,
+                RoleId = role.Id,
+            };
+            user.PasswordHash = hasher.HashPassword(user, DemoPassword);
+            db.Users.Add(user);
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedKnowledgeBaseAsync(AppDbContext db, string dataDirectory)
     {
         if (await db.KnowledgeArticles.AnyAsync())
         {

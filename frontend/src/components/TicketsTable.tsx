@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import type { Ticket } from '@/api'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,11 +19,13 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
   Closed: 'outline',
 }
 
-export function TicketsTable({ tickets }: { tickets: Ticket[] }) {
+export function TicketsTable({ tickets, title = 'Recent tickets' }: { tickets: Ticket[]; title?: string }) {
+  const navigate = useNavigate()
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent tickets</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         {tickets.length === 0 ? (
@@ -39,7 +42,11 @@ export function TicketsTable({ tickets }: { tickets: Ticket[] }) {
             </TableHeader>
             <TableBody>
               {tickets.map((t) => (
-                <TableRow key={t.id}>
+                <TableRow
+                  key={t.id}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/tickets/${t.id}`)}
+                >
                   <TableCell className="font-mono">{t.displayCode}</TableCell>
                   <TableCell>{t.category}</TableCell>
                   <TableCell>

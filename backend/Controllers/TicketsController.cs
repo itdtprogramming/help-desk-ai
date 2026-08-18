@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHelpAI.Api.Data;
@@ -6,17 +8,17 @@ using SmartHelpAI.Api.Models;
 namespace SmartHelpAI.Api.Controllers;
 
 public record CreateTicketRequest(
-    int ReportedByUserId,
     string ProblemDescription,
     string? ErrorMessage,
     string Category,
     string Priority = "Medium");
 
-public record UpdateTicketStatusRequest(string NewStatus, int ChangedByUserId, string? Note);
+public record UpdateTicketStatusRequest(string NewStatus, string? Note);
 
-public record AddTicketCommentRequest(int AuthorUserId, string Body, bool IsInternal = false);
+public record AddTicketCommentRequest(string Body, bool IsInternal = false);
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class TicketsController : ControllerBase
 {
@@ -27,6 +29,9 @@ public class TicketsController : ControllerBase
         _db = db;
     }
 
+    private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private bool IsTechnicianOrAdmin => User.IsInRole("Technician") || User.IsInRole("Admin");
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Ticket>>> GetAll(
         [FromQuery] string? status,
@@ -34,6 +39,13 @@ public class TicketsController : ControllerBase
         [FromQuery] int? assignedTechnicianId)
     {
         var query = _db.Tickets.AsQueryable();
+
+        // Plain "User" accounts only ever see the tickets they reported;
+        // the technician queue (all tickets) is restricted to staff roles.
+        if (!IsTechnicianOrAdmin)
+        {
+            query = query.Where(t => t.ReportedByUserId == CurrentUserId);
+        }
 
         if (!string.IsNullOrWhiteSpace(status))
         {
@@ -62,20 +74,25 @@ public class TicketsController : ControllerBase
             .Include(t => t.RelatedKnowledgeArticle)
             .FirstOrDefaultAsync(t => t.Id == id);
 
-        return ticket is null ? NotFound() : ticket;
+        if (ticket is null)
+        {
+            return NotFound();
+        }
+
+        if (!IsTechnicianOrAdmin && ticket.ReportedByUserId != CurrentUserId)
+        {
+            return Forbid();
+        }
+
+        return ticket;
     }
 
     [HttpPost]
     public async Task<ActionResult<Ticket>> Create(CreateTicketRequest request)
     {
-        if (!await _db.Users.AnyAsync(u => u.Id == request.ReportedByUserId))
-        {
-            return BadRequest("ReportedByUserId does not exist.");
-        }
-
         var ticket = new Ticket
         {
-            ReportedByUserId = request.ReportedByUserId,
+            ReportedByUserId = CurrentUserId,
             ProblemDescription = request.ProblemDescription,
             ErrorMessage = request.ErrorMessage,
             Category = request.Category,
@@ -93,6 +110,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPatch("{id:int}/status")]
+    [Authorize(Roles = "Technician,Admin")]
     public async Task<ActionResult<Ticket>> UpdateStatus(int id, UpdateTicketStatusRequest request)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -101,17 +119,12 @@ public class TicketsController : ControllerBase
             return NotFound();
         }
 
-        if (!await _db.Users.AnyAsync(u => u.Id == request.ChangedByUserId))
-        {
-            return BadRequest("ChangedByUserId does not exist.");
-        }
-
         _db.TicketStatusHistories.Add(new TicketStatusHistory
         {
             TicketId = ticket.Id,
             OldStatus = ticket.Status,
             NewStatus = request.NewStatus,
-            ChangedByUserId = request.ChangedByUserId,
+            ChangedByUserId = CurrentUserId,
             Note = request.Note
         });
 
@@ -126,25 +139,49 @@ public class TicketsController : ControllerBase
         return ticket;
     }
 
-    [HttpPost("{id:int}/comments")]
-    public async Task<ActionResult<TicketComment>> AddComment(int id, AddTicketCommentRequest request)
+    [HttpPatch("{id:int}/assign")]
+    [Authorize(Roles = "Technician,Admin")]
+    public async Task<ActionResult<Ticket>> AssignToSelf(int id)
     {
-        if (!await _db.Tickets.AnyAsync(t => t.Id == id))
+        var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
+        if (ticket is null)
         {
             return NotFound();
         }
 
-        if (!await _db.Users.AnyAsync(u => u.Id == request.AuthorUserId))
+        ticket.AssignedTechnicianId = CurrentUserId;
+        ticket.UpdatedAt = DateTime.UtcNow;
+        if (ticket.Status == TicketStatus.New)
         {
-            return BadRequest("AuthorUserId does not exist.");
+            ticket.Status = TicketStatus.InProgress;
+        }
+
+        await _db.SaveChangesAsync();
+        return ticket;
+    }
+
+    [HttpPost("{id:int}/comments")]
+    public async Task<ActionResult<TicketComment>> AddComment(int id, AddTicketCommentRequest request)
+    {
+        var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
+        if (ticket is null)
+        {
+            return NotFound();
+        }
+
+        if (!IsTechnicianOrAdmin && ticket.ReportedByUserId != CurrentUserId)
+        {
+            return Forbid();
         }
 
         var comment = new TicketComment
         {
             TicketId = id,
-            AuthorUserId = request.AuthorUserId,
+            AuthorUserId = CurrentUserId,
             Body = request.Body,
-            IsInternal = request.IsInternal
+            // Only staff can mark a comment internal-only; a reporter's own
+            // comment is never hidden from them.
+            IsInternal = request.IsInternal && IsTechnicianOrAdmin,
         };
 
         _db.TicketComments.Add(comment);

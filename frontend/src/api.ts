@@ -1,6 +1,20 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5299'
 const AI_BASE_URL = import.meta.env.VITE_AI_BASE_URL ?? 'http://localhost:8000'
 
+export type Role = 'User' | 'Technician' | 'Admin'
+
+const TOKEN_STORAGE_KEY = 'smarthelp.token'
+let authToken: string | null = localStorage.getItem(TOKEN_STORAGE_KEY)
+
+export function setAuthToken(token: string | null) {
+  authToken = token
+  if (token) {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token)
+  } else {
+    localStorage.removeItem(TOKEN_STORAGE_KEY)
+  }
+}
+
 export interface KnowledgeArticle {
   id: string
   category: string
@@ -45,7 +59,34 @@ export interface Ticket {
   category: string
   priority: string
   problemDescription: string
+  errorMessage: string | null
+  reportedByUserId: number
+  assignedTechnicianId: number | null
   createdAt: string
+  updatedAt: string
+  closedAt: string | null
+}
+
+export interface TicketStatusHistoryEntry {
+  id: number
+  oldStatus: string
+  newStatus: string
+  changedByUserId: number
+  changedAt: string
+  note: string | null
+}
+
+export interface TicketCommentEntry {
+  id: number
+  authorUserId: number
+  body: string
+  isInternal: boolean
+  createdAt: string
+}
+
+export interface TicketDetail extends Ticket {
+  statusHistory: TicketStatusHistoryEntry[]
+  comments: TicketCommentEntry[]
 }
 
 export interface AppUser {
@@ -53,14 +94,48 @@ export interface AppUser {
   fullName: string
   email: string
   roleId: number
+  department: string | null
+  isActive: boolean
 }
+
+export interface AuthResponse {
+  token: string
+  expiresAt: string
+  userId: number
+  fullName: string
+  email: string
+  role: Role
+}
+
+export const UNAUTHORIZED_EVENT = 'smarthelp:unauthorized'
 
 async function asJson<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    if (response.status === 401 && authToken) {
+      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
+    }
     const body = await response.text()
     throw new Error(`${response.status} ${response.statusText}: ${body}`)
   }
+  if (response.status === 204) {
+    return undefined as T
+  }
   return response.json() as Promise<T>
+}
+
+function authHeaders(): HeadersInit {
+  return authToken ? { Authorization: `Bearer ${authToken}` } : {}
+}
+
+function authedFetch(path: string, init: RequestInit = {}) {
+  return fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers: {
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+      ...authHeaders(),
+      ...init.headers,
+    },
+  })
 }
 
 export const aiApi = {
@@ -79,50 +154,59 @@ export const aiApi = {
     }).then((r) => asJson<RetrieveResponse>(r)),
 }
 
+export const authApi = {
+  login: (email: string, password: string) =>
+    fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    }).then((r) => asJson<AuthResponse>(r)),
+
+  register: (input: { fullName: string; email: string; password: string; department?: string }) =>
+    fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    }).then((r) => asJson<AuthResponse>(r)),
+}
+
 export const backendApi = {
   createTicket: (input: {
-    reportedByUserId: number
     problemDescription: string
     errorMessage?: string
     category: string
     priority?: string
   }) =>
-    fetch(`${API_BASE_URL}/api/tickets`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
+    authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify(input) }).then((r) =>
+      asJson<Ticket>(r),
+    ),
+
+  getTickets: () => authedFetch('/api/tickets').then((r) => asJson<Ticket[]>(r)),
+
+  getTicket: (id: number) => authedFetch(`/api/tickets/${id}`).then((r) => asJson<TicketDetail>(r)),
+
+  updateTicketStatus: (id: number, newStatus: string, note?: string) =>
+    authedFetch(`/api/tickets/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ newStatus, note }),
     }).then((r) => asJson<Ticket>(r)),
 
-  getTickets: () =>
-    fetch(`${API_BASE_URL}/api/tickets`).then((r) => asJson<Ticket[]>(r)),
+  assignTicketToSelf: (id: number) =>
+    authedFetch(`/api/tickets/${id}/assign`, { method: 'PATCH' }).then((r) => asJson<Ticket>(r)),
+
+  addTicketComment: (id: number, body: string, isInternal = false) =>
+    authedFetch(`/api/tickets/${id}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ body, isInternal }),
+    }).then((r) => asJson<TicketCommentEntry>(r)),
 
   getKnowledgeArticles: () =>
-    fetch(`${API_BASE_URL}/api/knowledgearticles`).then((r) => asJson<KnowledgeArticle[]>(r)),
+    authedFetch('/api/knowledgearticles').then((r) => asJson<KnowledgeArticle[]>(r)),
 
-  getUsers: () => fetch(`${API_BASE_URL}/api/users`).then((r) => asJson<AppUser[]>(r)),
+  getUsers: () => authedFetch('/api/users').then((r) => asJson<AppUser[]>(r)),
 
   createUser: (input: { fullName: string; email: string; password: string; roleId: number }) =>
-    fetch(`${API_BASE_URL}/api/users`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
-    }).then((r) => asJson<AppUser>(r)),
-}
-
-const DEMO_USER_EMAIL = 'demo.reporter@smarthelp.local'
-
-// The MVP has no login flow yet, so every ticket needs a reporter — this
-// finds or creates a single standing demo user rather than blocking the
-// retrieval/classification demo on building auth first.
-export async function getOrCreateDemoUser(): Promise<AppUser> {
-  const users = await backendApi.getUsers()
-  const existing = users.find((u) => u.email === DEMO_USER_EMAIL)
-  if (existing) return existing
-
-  return backendApi.createUser({
-    fullName: 'Demo Reporter',
-    email: DEMO_USER_EMAIL,
-    password: 'Demo@12345',
-    roleId: 3,
-  })
+    authedFetch('/api/users', { method: 'POST', body: JSON.stringify(input) }).then((r) =>
+      asJson<AppUser>(r),
+    ),
 }
