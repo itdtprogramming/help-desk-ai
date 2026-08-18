@@ -1,0 +1,201 @@
+[
+  {"id":"INC-0001","text":"البرنامج ما بيفتح عندي وطالع خطأ VCRUNTIME140.dll missing","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0001","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0002","text":"حاولت افتح التطبيق أكثر من مرة وكل مرة يسكر لحاله ويطلع رسالة خطأ فيها اسم ملف dll ما عرفت أفهمه","language_mix":"ar","category":"Software","gold_kb_id":"KB-0001","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0003","text":"من أمس والبرنامج تبعي مش شغال، مش عارف شو المشكلة بالضبط","language_mix":"ar","category":"Software","gold_kb_id":"KB-0001","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0004","text":"بعتقد المشكلة بالانترنت لأنو البرنامج ما بيفتح وبيسكر عفكرة","language_mix":"ar","category":"Software","gold_kb_id":"KB-0001","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0005","text":"Office بيطلع خطأ activation error 0x8004FC12 ومش قادر افتح ملفاتي","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0002","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0006","text":"من الصبح ووورد عم يطلب مني أفعّل النسخة كل ما بفتحه","language_mix":"ar","category":"Software","gold_kb_id":"KB-0002","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0007","text":"وورد وإكسل عم يطلبوا مني تفعيل الترخيص من جديد وما عم يفتحوا الملفات القديمة","language_mix":"ar","category":"Software","gold_kb_id":"KB-0002","paraphrase_style":"paraphrase","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0008","text":"برنامج المحاسبة صار يطلب رخصة، بس أنا متأكد إنه مشكلة بالشبكة مش بالبرنامج","language_mix":"ar","category":"Software","gold_kb_id":"KB-0002","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0009","text":"جهازي ما عم يشتغل، بضغط زر التشغيل وما في ولا إشارة على الشاشة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0003","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0010","text":"لا شاشة ولا أي صوت مروحة عند تشغيل الكمبيوتر، جربت أكثر من مرة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0003","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0011","text":"الجهاز ساكت تمام ما عم يطلع صوت ولا نور","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0003","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0012","text":"بعتقد الكهربا بالمكتب مقطوعة لهيك جهازي ما يشتغل","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0003","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0013","text":"جهازي عم ياخد وقت طويل كتير لما بشغله، أكثر من عشر دقايق لحتى تفتح الشاشة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0004","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0014","text":"من فترة جهازي صار يتأخر كتير بالإقلاع مقارنة بالسابق","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0004","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0015","text":"اللابتوب صار بطيء جدًا هالفترة، فتح أي برنامج ياخد دهر، وقبل هيك كان تمام","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0004","paraphrase_style":"paraphrase","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0016","text":"بعتقد المشكلة من كثرة البرامج المفتوحة مش من الجهاز نفسه","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0004","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0017","text":"ما عم قدر افتح الشير تبع القسم، طالعة رسالة network path was not found","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0005","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0018","text":"مجلد القسم المشترك ما عم يفتح معي من الصبح، وزملائي قادرين يفتحوه","language_mix":"ar","category":"Network","gold_kb_id":"KB-0005","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0019","text":"من الصبح ومش قادر افتح مجلدات المشاركة عالسيرفر، عم يقول المسار مش موجود","language_mix":"ar","category":"Network","gold_kb_id":"KB-0005","paraphrase_style":"paraphrase","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0020","text":"بعتقد صلاحيتي انسحبت لأنو المجلد المشترك ما عم يفتح","language_mix":"ar","category":"Network","gold_kb_id":"KB-0005","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0021","text":"الإنترنت عندي بطيء كتير من الصبح وعم ينقطع كل شوي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0006","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0022","text":"الاتصال بالشبكة مش ثابت، بيوقع وبيرجع يتصل بشكل غريب من قبل شوي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0006","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0023","text":"الشبكة عندي مش تمام اليوم","language_mix":"ar","category":"Network","gold_kb_id":"KB-0006","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0024","text":"بعتقد الراوتر عندي بالبيت هو المشكلة مش شبكة الشركة","language_mix":"ar","category":"Network","gold_kb_id":"KB-0006","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0025","text":"نسيت الباسورد تبعي ومش قادر سجل دخول عالنظام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0007","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0026","text":"ما عم قدر أتذكر كلمة السر تبعي من الصبح","language_mix":"ar","category":"Account","gold_kb_id":"KB-0007","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0027","text":"كل ما بحاول ادخل عحسابي بيقولي كلمة السر غلط، بس أنا متأكد إنها صح","language_mix":"ar","category":"Account","gold_kb_id":"KB-0007","paraphrase_style":"paraphrase","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0028","text":"بعتقد حسابي تم اختراقه لهيك كلمة السر ما عم تشتغل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0007","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0029","text":"حسابي انقفل بعد ما حاولت أسجل دخول كذا مرة وطلعتلي رسالة account locked","language_mix":"ar+en","category":"Account","gold_kb_id":"KB-0008","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0030","text":"حاولت أدخل عحسابي كم مرة غلط والحين مش عم يقبلني أبدًا حتى بكلمة السر الصحيحة","language_mix":"ar","category":"Account","gold_kb_id":"KB-0008","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0031","text":"صار معي إنو ما قدرت فوت عالنظام أبدًا بعد كم محاولة، ضل يرفض الدخول","language_mix":"ar","category":"Account","gold_kb_id":"KB-0008","paraphrase_style":"paraphrase","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0032","text":"بعتقد حد غيري حاول يفتح حسابي لهيك انقفل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0008","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0033","text":"حاولت أنزل برنامج من الفهرس المعتمد بس الأنتي فايروس رفضه وحذفه","language_mix":"ar","category":"Software","gold_kb_id":"KB-0009","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0034","text":"كل ما بحاول اثبت البرنامج المعتمد يطلعلي تحذير حماية ويوقف التثبيت","language_mix":"ar","category":"Software","gold_kb_id":"KB-0009","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0035","text":"ما قدرت اثبت برنامج شغل، مش عارف ليش","language_mix":"ar","category":"Software","gold_kb_id":"KB-0009","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0036","text":"بعتقد الجهاز فيه فايروس لأنو البرنامج ما ثبت","language_mix":"ar","category":"Software","gold_kb_id":"KB-0009","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0037","text":"التطبيق بتجمد كل ما بفتحه من أول ما فتحته اليوم","language_mix":"ar","category":"Software","gold_kb_id":"KB-0010","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0038","text":"صار البرنامج يهنغ (not responding) بلحظة ما بفتحه من كم يوم","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0010","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0039","text":"البرنامج بطّل يفتح تمام من فترة","language_mix":"ar","category":"Software","gold_kb_id":"KB-0010","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0040","text":"بعتقد المشكلة من التحديث الأخير للويندوز خلت البرنامج يتجمد","language_mix":"ar","category":"Software","gold_kb_id":"KB-0010","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0041","text":"ملفات PDF ما عم تفتح بالبرنامج الصحيح، عم تفتح ببرنامج غريب","language_mix":"ar","category":"Software","gold_kb_id":"KB-0011","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0042","text":"من بعد ما حدثوا الجهاز صارت ملفات PDF ما بتفتح بشكل طبيعي","language_mix":"ar","category":"Software","gold_kb_id":"KB-0011","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0043","text":"الملفات ما عم تفتح صحيح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0011","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0044","text":"بعتقد إنه الملف نفسه تالف لهيك ما بيفتح PDF","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0011","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0045","text":"المتصفح رافض يفتح بوابة النظام وطالع NET::ERR_CERT_AUTHORITY_INVALID","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0012","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0046","text":"من الصبح ومش قادر افتح البوابة الداخلية، عم تطلع رسالة تحذير أمان بالمتصفح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0012","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0047","text":"البوابة ما عم تفتح عندي","language_mix":"ar","category":"Software","gold_kb_id":"KB-0012","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0048","text":"بعتقد الإنترنت تبعي بطيء لهيك البوابة ما بتفتح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0012","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0049","text":"قائمة الطباعة عالقة وما في مستندات عم تطبع من الصبح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0013","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0050","text":"بعتلك ملفات للطباعة بس ما في شي عم يطلع من الطابعة، الطابور عالق","language_mix":"ar","category":"Software","gold_kb_id":"KB-0013","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0051","text":"الطباعة ما عم تشتغل","language_mix":"ar","category":"Software","gold_kb_id":"KB-0013","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0052","text":"بعتقد الطابعة خربانة لأنو الأوراق ما عم تطبع","language_mix":"ar","category":"Software","gold_kb_id":"KB-0013","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0053","text":"برنامج البريد ما عم يزامن الرسائل الجديدة من الصبح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0014","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0054","text":"من فترة الإيميل تبعي مش عم يجيبلي رسائل جديدة إلا إذا سكرت البرنامج وفتحته من جديد","language_mix":"ar","category":"Software","gold_kb_id":"KB-0014","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0055","text":"البريد مش شغال منيح","language_mix":"ar","category":"Software","gold_kb_id":"KB-0014","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0056","text":"بعتقد صندوق بريدي ممتلئ لهيك ما عم يجيني إيميلات","language_mix":"ar","category":"Software","gold_kb_id":"KB-0014","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0057","text":"تحديث البرنامج فشل وطلع رسالة إنه ما في مساحة كافية بالقرص","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0015","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0058","text":"حاولت حدث البرنامج كم مرة وكل مرة يفشل بسبب القرص","language_mix":"ar","category":"Software","gold_kb_id":"KB-0015","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0059","text":"التحديث ما عم يخلص","language_mix":"ar","category":"Software","gold_kb_id":"KB-0015","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0060","text":"بعتقد الإنترنت ضعيف لهيك التحديث ما عم يكمل","language_mix":"ar","category":"Software","gold_kb_id":"KB-0015","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0061","text":"بعد ساعتين استخدام البرنامج بيتجمد وما عم يستجيب","language_mix":"ar+en","category":"Software","gold_kb_id":"KB-0016","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0062","text":"البرنامج شغال منيح بالأول بس بعد فترة طويلة من الشغل بيعلق","language_mix":"ar","category":"Software","gold_kb_id":"KB-0016","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0063","text":"بعد فترة البرنامج بوقف يستجيب","language_mix":"ar","category":"Software","gold_kb_id":"KB-0016","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0064","text":"بعتقد جهازي ضعيف لهيك البرنامج بيعلق بعد فترة","language_mix":"ar","category":"Software","gold_kb_id":"KB-0016","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0065","text":"لوحة المفاتيح تبعتي ما عم تستجيب من الصبح","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0017","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0066","text":"الفأرة وقفت تتحرك فجأة وجربت أعيد توصيلها بدون فايدة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0017","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0067","text":"الفأرة ما عم تشتغل","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0017","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0068","text":"بعتقد المشكلة من البطارية لأنو الفأرة ما عم تتحرك","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0017","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0069","text":"بطارية اللابتوب ما عم تشحن مع إنو الشاحن موصول","language_mix":"ar+en","category":"Hardware","gold_kb_id":"KB-0018","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0070","text":"من يومين والشاحن موصول بس نسبة البطارية ما عم تزيد","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0018","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0071","text":"البطارية ما عم تشتغل منيح","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0018","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0072","text":"بعتقد المقبس بالحيط خربان لهيك البطارية ما تشحن","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0018","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0073","text":"شاشة جهازي عم تومض وفيها خطوط غريبة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0019","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0074","text":"من الصبح والشاشة عم تعمل فلاش بشكل متكرر وصعب أشوف الشاشة منيح","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0019","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0075","text":"الشاشة فيها شي غريب","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0019","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0076","text":"بعتقد إعدادات العرض غلط لهيك الشاشة عم تومض","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0019","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0077","text":"جهازي عم يسخن كتير وبيسكر نفسه لحاله بعد شوي","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0020","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0078","text":"من فترة اللابتوب عم يطفى لحاله بدون تحذير، وحاسس إنو سخن قبل ما يطفى","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0020","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0079","text":"جهازي عم يطفى لحاله بشكل غريب","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0020","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0080","text":"بعتقد المشكلة من الشاحن لأنو الجهاز عم يطفى وهو موصول","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0020","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0081","text":"ما في صوت من جهازي أبدًا من الصبح","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0021","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0082","text":"الصوت مقطوع تمامًا من اللابتوب مع إنو الفيديو عم يشتغل عادي","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0021","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0083","text":"الصوت مش شغال","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0021","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0084","text":"بعتقد السماعات خربانة مش الجهاز","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0021","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0085","text":"جهازي بيطلع شاشة زرقاء وبيعيد التشغيل لحاله كل شوي","language_mix":"ar+en","category":"Hardware","gold_kb_id":"KB-0022","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0086","text":"من الصبح والجهاز عم يعيد التشغيل لحاله بشكل عشوائي مع شاشة زرقاء","language_mix":"ar+en","category":"Hardware","gold_kb_id":"KB-0022","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0087","text":"جهازي عم يطفى ويرجع يشتغل لحاله بشكل غريب","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0022","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0088","text":"بعتقد المشكلة من برنامج ثبتته جديد لهيك الجهاز عم يعيد التشغيل","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0022","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0089","text":"وصلت شاشة خارجية بس ما عم تظهر أي إشارة عليها","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0023","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0090","text":"جربت أوصل شاشة ثانية باللابتوب وما عم تنكشف أبدًا","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0023","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0091","text":"الشاشة الخارجية ما عم تشتغل","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0023","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0092","text":"بعتقد الشاشة نفسها خربانة مش اللابتوب","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0023","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0093","text":"الطابعة عم تعلق الورق بشكل متكرر كل ما بحاول اطبع","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0024","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0094","text":"من فترة الطابعة صارت تعلق الورق باستمرار مع إني مغير الورق","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0024","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0095","text":"الطابعة فيها مشكلة بالورق","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0024","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0096","text":"بعتقد نوع الورق يلي عم استخدمه هو المشكلة","language_mix":"ar","category":"Hardware","gold_kb_id":"KB-0024","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0097","text":"ما عم قدر اتصل بـ VPN من البيت من الصبح، عم يطلع خطأ توثيق","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0025","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0098","text":"جربت أفتح الـVPN من خارج الشركة وكل مرة يفشل الاتصال","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0025","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0099","text":"ما عم قدر افتح شغلي من البيت","language_mix":"ar","category":"Network","gold_kb_id":"KB-0025","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0100","text":"بعتقد كلمة السر تبعي غلط لهيك VPN ما عم يتصل","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0025","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0101","text":"كل الأنظمة شغالة عندي عادي إلا نظام واحد محدد ما عم يفتح","language_mix":"ar","category":"Network","gold_kb_id":"KB-0026","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0102","text":"نظام التقارير بالتحديد ما عم يفتح معي بس باقي المواقع الداخلية شغالة","language_mix":"ar","category":"Network","gold_kb_id":"KB-0026","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0103","text":"نظام معين ما عم يفتح معي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0026","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0104","text":"بعتقد الإنترنت تبعي عموما بطيء لهيك النظام ما بيفتح","language_mix":"ar","category":"Network","gold_kb_id":"KB-0026","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0105","text":"جهازي متصل بالشبكة بس ما عم ياخد عنوان شبكة صحيح","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0027","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0106","text":"من الصبح والجهاز يقول متصل بس ما عم يفتح أي موقع داخلي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0027","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0107","text":"الشبكة عندي مش شغالة صحيح رغم إنها متصلة","language_mix":"ar","category":"Network","gold_kb_id":"KB-0027","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0108","text":"بعتقد كابل الشبكة مقطوع لهيك ما في اتصال","language_mix":"ar","category":"Network","gold_kb_id":"KB-0027","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0109","text":"الطابعة الشبكية تبع القسم ما عم تظهر عندي على الجهاز","language_mix":"ar","category":"Network","gold_kb_id":"KB-0028","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0110","text":"من الصبح مش قادر شوف طابعة القسم بلائحة الطابعات عندي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0028","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0111","text":"الطابعة مش ظاهرة عندي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0028","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0112","text":"بعتقد الطابعة نفسها معطلة لهيك ما عم تظهر","language_mix":"ar","category":"Network","gold_kb_id":"KB-0028","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0113","text":"الواي فاي الداخلي ما عم يقبل يوصلني ويطلع خطأ توثيق","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0029","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0114","text":"من الصبح جهازي ما عم يتصل بشبكة الشركة اللاسلكية مع إنو كان شغال قبل","language_mix":"ar","category":"Network","gold_kb_id":"KB-0029","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0115","text":"الواي فاي ما عم يشتغل معي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0029","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0116","text":"بعتقد كلمة سر الواي فاي تغيرت لهيك ما عم يتصل","language_mix":"ar","category":"Network","gold_kb_id":"KB-0029","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0117","text":"البريد ما عم يرسل وطالع خطأ اتصال بالخادم","language_mix":"ar+en","category":"Network","gold_kb_id":"KB-0030","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0118","text":"من الصبح كل رسالة بحاول ابعتها بترجع فيها خطأ ارسال","language_mix":"ar","category":"Network","gold_kb_id":"KB-0030","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0119","text":"الإيميل ما عم يبعت","language_mix":"ar","category":"Network","gold_kb_id":"KB-0030","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0120","text":"بعتقد المرسل إليه حظرني لهيك الإيميل ما عم يوصل","language_mix":"ar","category":"Network","gold_kb_id":"KB-0030","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0121","text":"برنامج الاجتماعات ما عم يتصل وينقطع بشكل متكرر بالاجتماع","language_mix":"ar","category":"Network","gold_kb_id":"KB-0031","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0122","text":"من الصبح كل اجتماع أدخله بينقطع الصوت والصورة كل شوي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0031","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0123","text":"الاجتماعات عم تنقطع معي كتير","language_mix":"ar","category":"Network","gold_kb_id":"KB-0031","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0124","text":"بعتقد الكاميرا تبعي خربانة لهيك الاجتماع بينقطع","language_mix":"ar","category":"Network","gold_kb_id":"KB-0031","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0125","text":"القرص المرتبط بمجلد المشاركة عم ينفصل لحاله بشكل عشوائي","language_mix":"ar","category":"Network","gold_kb_id":"KB-0032","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0126","text":"من الصبح المجلد المرتبط عندي عم يفقد الاتصال كل شوي وبضطر أربطه من جديد","language_mix":"ar","category":"Network","gold_kb_id":"KB-0032","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0127","text":"المجلد المشترك عم يفصل لحاله","language_mix":"ar","category":"Network","gold_kb_id":"KB-0032","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0128","text":"بعتقد جهازي هو المشكلة مش الشبكة","language_mix":"ar","category":"Network","gold_kb_id":"KB-0032","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0129","text":"انضميت للشركة من يومين وللحين ما عندي حساب على النظام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0033","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0130","text":"زميلي الجديد بالقسم ما عندو حساب نظام من أول يوم دوام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0033","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0131","text":"ما عندي حساب للدخول للنظام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0033","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0132","text":"بعتقد قسم الموارد البشرية نسيوني تماما","language_mix":"ar","category":"Account","gold_kb_id":"KB-0033","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0133","text":"عم تطلعلي رسالة رفض صلاحية كل ما بحاول افتح نظام المخزون","language_mix":"ar+en","category":"Account","gold_kb_id":"KB-0034","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0134","text":"من الصبح ما عم قدر افتح نظام معين وعم يقول عندي صلاحية غير كافية","language_mix":"ar","category":"Account","gold_kb_id":"KB-0034","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0135","text":"ما عم قدر افتح نظام محدد","language_mix":"ar","category":"Account","gold_kb_id":"KB-0034","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0136","text":"بعتقد حسابي معطل بالكامل لهيك ما عم يفتح النظام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0034","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0137","text":"صندوق بريدي ممتلئ وما عم يقدر يستقبل رسائل جديدة","language_mix":"ar+en","category":"Account","gold_kb_id":"KB-0035","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0138","text":"من فترة ما عم يوصلني إيميلات جديدة وحسيت إنو الصندوق مليان","language_mix":"ar","category":"Account","gold_kb_id":"KB-0035","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0139","text":"البريد ما عم يوصلني منيح","language_mix":"ar","category":"Account","gold_kb_id":"KB-0035","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0140","text":"بعتقد خدمة البريد كلها متوقفة بالشركة","language_mix":"ar","category":"Account","gold_kb_id":"KB-0035","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0141","text":"ضيعت جوالي يلي عليه تطبيق التوثيق وما عم قدر سجل دخول","language_mix":"ar+en","category":"Account","gold_kb_id":"KB-0036","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0142","text":"تلف جوالي يلي كان عليه رمز الدخول الثنائي ومش عارف كيف بس دخل عحسابي","language_mix":"ar","category":"Account","gold_kb_id":"KB-0036","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0143","text":"ما عم قدر أثبت هويتي لدخول الحساب","language_mix":"ar","category":"Account","gold_kb_id":"KB-0036","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0144","text":"بعتقد كلمة السر تبعي هي المشكلة مش جهاز التوثيق","language_mix":"ar","category":"Account","gold_kb_id":"KB-0036","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0145","text":"رجعت من إجازة طويلة وحسابي عم يطلع معطل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0037","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0146","text":"بعد غياب شهرين عن الدوام صار حسابي ما عم يفتح أبدًا","language_mix":"ar","category":"Account","gold_kb_id":"KB-0037","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0147","text":"حسابي مش شغال بعد رجوعي للشغل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0037","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0148","text":"بعتقد كلمة سري انتهت صلاحيتها لهيك الحساب معطل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0037","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0149","text":"ما عم قدر افتح صندوق البريد المشترك تبع القسم","language_mix":"ar","category":"Account","gold_kb_id":"KB-0038","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0150","text":"من الصبح ما عم قدر شوف رسائل صندوق بريد القسم المشترك مع إني بشتغل عليه دايمًا","language_mix":"ar","category":"Account","gold_kb_id":"KB-0038","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0151","text":"صندوق البريد المشترك مش ظاهر عندي","language_mix":"ar","category":"Account","gold_kb_id":"KB-0038","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0152","text":"بعتقد الصندوق المشترك انحذف بالكامل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0038","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0153","text":"انتقلت لقسم جديد وحسابي للحين عم يطلع تبع القسم القديم","language_mix":"ar","category":"Account","gold_kb_id":"KB-0039","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0154","text":"بعد النقل الوظيفي صلاحياتي وبياناتي عالنظام لسا ما تحدثت","language_mix":"ar","category":"Account","gold_kb_id":"KB-0039","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0155","text":"بياناتي عالنظام مش صحيحة بعد النقل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0039","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0156","text":"بعتقد القسم الجديد حظرني من النظام","language_mix":"ar","category":"Account","gold_kb_id":"KB-0039","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false},
+
+  {"id":"INC-0157","text":"النظام عم يسجل خروجي لحاله كل شوي وأنا عم بشتغل عادي","language_mix":"ar","category":"Account","gold_kb_id":"KB-0040","paraphrase_style":"direct","split":"train","rewritten_by_human":false},
+  {"id":"INC-0158","text":"من الصبح صار ينطقني النظام برا كل كم دقيقة رغم إني قاعد بشتغل","language_mix":"ar","category":"Account","gold_kb_id":"KB-0040","paraphrase_style":"paraphrase","split":"train","rewritten_by_human":false},
+  {"id":"INC-0159","text":"النظام عم يخرجني لحاله بشكل متكرر","language_mix":"ar","category":"Account","gold_kb_id":"KB-0040","paraphrase_style":"vague","split":"eval","rewritten_by_human":false},
+  {"id":"INC-0160","text":"بعتقد الانترنت تبعي هو المشكلة يلي عم يفصلني","language_mix":"ar","category":"Account","gold_kb_id":"KB-0040","paraphrase_style":"misleading","split":"eval","rewritten_by_human":false}
+]
