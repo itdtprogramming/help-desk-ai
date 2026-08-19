@@ -71,12 +71,23 @@ field.
 - JWT bearer tokens. `POST /api/auth/login` and `POST /api/auth/register`
   issue a token containing the user's id, name, email, and role.
 - Every controller requires a valid token (`[Authorize]`). Ticket
-  **resolution** work (change status, assign-to-self) is `Technician`-only;
-  ticket **reassignment** to a specific technician is `Admin`-only; user
-  management requires `Admin` only. This is a deliberate separation of
-  duties: an Admin governs users/roles/routing but does not personally
-  resolve tickets, so "who is allowed to fix things" and "who fixed this
-  ticket" stay on distinct, auditable roles.
+  **resolution** work (change status) is `Technician`-only; ticket
+  **reassignment** to a specific technician, and ticket **deletion**, are
+  `Admin`-only; user management requires `Admin` only. This is a deliberate
+  separation of duties: an Admin governs users/roles/routing and has full
+  CRUD authority over ticket records, but does not personally resolve
+  tickets, so "who is allowed to fix things" and "who fixed this ticket"
+  stay on distinct, auditable roles.
+- **Visibility is assignment-gated, not role-gated**: a ticket is visible
+  only to the reporter, an Admin (sees everything), and — once an Admin has
+  routed it — the specific Technician it is assigned to. A Technician a
+  ticket has not been routed to cannot see it at all (list, detail, or
+  comment) — there is no shared "queue" of unassigned work to browse, and
+  there is no technician-initiated self-assign. Enforced server-side in
+  `TicketsController` (`CanAccessTicket`), not just hidden in the UI.
+- Internal staff comments (`IsInternal = true`) are stripped from a
+  ticket's comment list before it is ever sent to the reporter — checked
+  server-side per request, not assumed from the client.
 - Self-registration always creates a plain `"User"` account — Technician
   and Admin accounts can only be created by an Admin through the Users page.
 - `ReportedByUserId`, `ChangedByUserId`, and `AuthorUserId` are read from
@@ -85,11 +96,11 @@ field.
 
 **Controllers** (`backend/Controllers/`):
 - `AuthController` — login, register.
-- `TicketsController` — list (role-filtered: a `User` only sees their own
-  tickets; `Technician`/`Admin` see everything), get by id (with status
-  history and comments), create, change status (`Technician`), assign-to-self
-  (`Technician`), reassign to a specific technician (`Admin`), add comment
-  (internal-only comments are only possible for staff roles).
+- `TicketsController` — list and get-by-id (both scoped by the
+  assignment-gated visibility rule above), create, change status
+  (`Technician`, only if assigned to that ticket), reassign to a specific
+  technician (`Admin`), delete (`Admin`), add comment (internal-only
+  comments are only possible for staff roles).
 - `KnowledgeArticlesController` — list/get approved articles.
 - `UsersController` (Admin-only) — list users, create a user with any role.
 
@@ -141,27 +152,33 @@ paper over for a demo.
 ## 6. Frontend (`frontend/`)
 
 React + TypeScript + Vite, styled with **Tailwind CSS v4** and
-**shadcn/ui** components, laid out behind a collapsible left sidebar
+**shadcn/ui** components, laid out behind a collapsible sidebar
 (`react-router-dom` for routing).
 
-**Design language**: sharp corners everywhere (`--radius: 0`), translucent
-glassmorphism panels (blurred, semi-transparent cards/sidebar/popovers)
-over a flat, neutral (no color) background with a subtle depth vignette —
-chosen after iterating away from an earlier, more colorful version per
-feedback that it read as noisy for a minimalist design.
+**Design language**: minimalist and Apple-like — flat, opaque surfaces
+(no blur, no glass) with a single soft shadow; soft continuous corner
+radius (`0.75rem`) on cards/buttons/inputs; one restrained accent color
+(a system blue) used only for primary buttons, links, active nav state,
+and focus rings, with everything else neutral grayscale; an `-apple-system`
+/ SF Pro / Segoe UI font stack. This replaced an earlier version that used
+sharp corners everywhere and glassmorphism panels over a gradient hero
+(indigo→violet→fuchsia) with `Sparkles` icons throughout — dropped for
+reading as a generic "AI-generated app" look rather than a considered
+product design.
 
 **Pages** (`frontend/src/pages/`):
 - `Assistant` (`/`) — the main demo flow: describe a problem, see the
   predicted category and Top-3 KB matches, escalate to a ticket if needed.
 - `Tickets` (`/tickets`) — a `User` sees only their own tickets ("My
-  tickets"); `Technician`/`Admin` see the full queue ("Ticket queue").
-  Clicking a row opens the ticket detail page.
+  tickets"); an `Admin` sees every ticket ("Ticket queue"); a `Technician`
+  sees only tickets an Admin has routed to them ("Assigned to you"), never
+  a shared queue. Clicking a row opens the ticket detail page.
 - `TicketDetail` (`/tickets/:id`) — problem details, status history, and a
   comment thread (staff can mark a comment "internal", hidden from the
-  reporter). A `Technician` additionally sees an "Assign to me" button, a
-  status-change control, and the internal-note checkbox; an `Admin` instead
-  sees a "Reassign" control to route the ticket to a specific technician —
-  matching the backend's separation of duties.
+  reporter). A `Technician` sees a status-change control and the
+  internal-note checkbox; an `Admin` sees a "Reassign" control to route the
+  ticket to a specific technician and a "Delete ticket" button — matching
+  the backend's separation of duties and CRUD authority.
 - `KnowledgeBase` (`/knowledge-base`) — a searchable list of all 40
   approved articles.
 - `Login` / `Register` (`/login`, `/register`) — the login page shows the
@@ -176,6 +193,19 @@ React context holds the current user and JWT (persisted to
 or back to `/` if a role-restricted route (like `/users`) is visited
 without permission; an automatic logout fires if the backend ever returns
 401 (e.g. an expired token).
+
+**Bilingual UI / RTL** (`frontend/src/i18n.tsx`): a language toggle button
+(English ⇄ العربية) appears on every page, including Login and Register.
+Switching language re-renders every page's text from a single translation
+dictionary and sets `dir="rtl"`/`lang="ar"` on `<html>`, persisted to
+`localStorage`. Directional UI (password-reveal icon, search icon, dialog
+close button, active-nav border) uses CSS logical properties (`start-`/
+`end-`/`ps-`/`pe-`) instead of physical `left`/`right`, so it mirrors
+correctly instead of getting stuck on one physical side. The sidebar
+itself switches from `side="left"` to `side="right"` when Arabic is active
+— both the fixed desktop rail and the mobile off-canvas sheet — since
+Arabic's reading start is on the right. Verified with no page-level
+horizontal overflow at 375px/768px/1280px widths in both languages.
 
 ## 7. How to run it locally
 
@@ -214,8 +244,20 @@ not just reading the code:
 - The Admin/Technician separation of duties (reassign vs. resolve) verified
   end-to-end in a browser: an Admin reassigning a ticket to a technician
   (`PATCH /api/tickets/{id}/reassign`, 200 OK), and that technician then
-  seeing the resolution controls (assign/status/internal note) the Admin
-  does not have.
+  seeing the resolution controls (status/internal note) the Admin does not
+  have.
+- The assignment-gated visibility model verified with a scripted run
+  against the live API covering the full lifecycle: a User's ticket is
+  invisible to an unassigned Technician (list excludes it, direct GET
+  returns 403); an Admin reassigns it; the Technician then sees it and can
+  update status; the old self-assign endpoint no longer exists (404); the
+  reporter sees the Technician's public comment but never an internal one;
+  an Admin deletes the ticket (204) and it is gone (404 on subsequent GET);
+  a non-Admin's delete attempt is rejected (403).
+- The language toggle and RTL layout verified in-browser in both languages:
+  full text translation, `dir`/`lang` switching, and no horizontal page
+  overflow at mobile/tablet/desktop widths — including the sidebar
+  correctly switching sides (desktop rail and mobile sheet) for Arabic.
 
 ## 9. What is **not** built yet (honest gaps)
 
@@ -239,6 +281,9 @@ not just reading the code:
   convenience — fine for a local student/dev project, but a production
   deployment must replace it with a real secret (environment variable /
   user-secrets / key vault), never a committed value.
+- The language toggle covers UI chrome text only (English/Arabic); it does
+  not localize dates, numbers, or the AI-generated content itself (KB
+  articles and problem descriptions are already natively bilingual data).
 
 ## 10. Repository map
 
@@ -321,13 +366,23 @@ SQL Server محلية (`SQLEXPRESS`).
 **تسجيل الدخول والصلاحيات** (`backend/Auth/`، `AuthController`):
 - رموز JWT. تصدر `POST /api/auth/login` و `POST /api/auth/register` رمزًا
   يحتوي على معرّف المستخدم واسمه وبريده الإلكتروني ودوره.
-- كل نقطة وصول (Controller) تتطلب رمزًا صالحًا (`[Authorize]`). أعمال
-  **حل التذكرة** (تغيير الحالة، تعيينها للنفس) مقتصرة على `Technician`؛
-  أما **إعادة التوجيه** (تعيين التذكرة لفني محدد) فمقتصرة على `Admin`؛
-  وإدارة المستخدمين تتطلب `Admin` فقط. هذا فصل مقصود للمهام: المسؤول يدير
-  المستخدمين والأدوار والتوجيه لكنه لا يحل التذاكر بنفسه، بحيث تبقى "من
-  يملك صلاحية الإصلاح" و"من أصلح هذه التذكرة فعليًا" على دورين مختلفين
-  وقابلين للتدقيق.
+- كل نقطة وصول (Controller) تتطلب رمزًا صالحًا (`[Authorize]`). عمل
+  **حل التذكرة** (تغيير الحالة) مقتصر على `Technician`؛ أما **إعادة
+  التوجيه** لفني محدد و**حذف** التذكرة فمقتصران على `Admin`؛ وإدارة
+  المستخدمين تتطلب `Admin` فقط. هذا فصل مقصود للمهام: المسؤول يدير
+  المستخدمين والأدوار والتوجيه ويملك صلاحية كاملة على سجلات التذاكر (CRUD)،
+  لكنه لا يحل التذاكر بنفسه، بحيث تبقى "من يملك صلاحية الإصلاح" و"من أصلح
+  هذه التذكرة فعليًا" على دورين مختلفين وقابلين للتدقيق.
+- **الرؤية مرتبطة بالإسناد لا بالدور**: لا تظهر التذكرة إلا لمُبلّغها،
+  وللمسؤول (يرى كل شيء)، وبعد أن يوجّهها المسؤول، للفني المحدد الذي
+  أُسندت إليه. لا يستطيع أي فني رؤية تذكرة لم تُسند إليه على الإطلاق
+  (لا في القائمة، ولا التفاصيل، ولا التعليقات) — لا توجد "قائمة انتظار"
+  مشتركة يتصفحها الفنيون، ولا تعيين ذاتي من قبل الفني. هذا مُطبَّق من
+  جهة الخادم (`CanAccessTicket` في `TicketsController`)، وليس مجرد إخفاء
+  في الواجهة.
+- تُحذف التعليقات الداخلية للفنيين (`IsInternal = true`) من قائمة تعليقات
+  التذكرة قبل إرسالها إلى المُبلّغ — يتم التحقق من ذلك من جهة الخادم في
+  كل طلب، وليس اعتمادًا على ما يرسله المتصفح.
 - التسجيل الذاتي ينشئ دائمًا حساب "User" عاديًا فقط — حسابات الفني
   والمسؤول لا يمكن إنشاؤها إلا من قبل مسؤول عبر صفحة المستخدمين.
 - يتم قراءة هوية مُبلّغ التذكرة ومن غيّر حالتها ومن كتب التعليق من رمز
@@ -336,12 +391,11 @@ SQL Server محلية (`SQLEXPRESS`).
 
 **نقاط الوصول (Controllers)** (`backend/Controllers/`):
 - `AuthController` — تسجيل الدخول والتسجيل الجديد.
-- `TicketsController` — عرض التذاكر (مُفلترة حسب الدور: "User" يرى
-  تذاكره فقط، بينما "Technician"/"Admin" يريان كل التذاكر)، عرض تذكرة
-  واحدة (مع سجل الحالات والتعليقات)، إنشاء تذكرة، تغيير الحالة (للفني
-  فقط)، تعيين التذكرة لنفس الفني (للفني فقط)، إعادة تعيين التذكرة لفني
-  محدد (للمسؤول فقط)، وإضافة تعليق (التعليقات الداخلية فقط للفنيين
-  والمسؤولين).
+- `TicketsController` — عرض القائمة وعرض تذكرة واحدة (كلاهما مُقيَّد
+  بقاعدة الرؤية المرتبطة بالإسناد أعلاه)، إنشاء تذكرة، تغيير الحالة
+  (للفني، فقط إذا كانت التذكرة مُسندة إليه)، إعادة تعيين التذكرة لفني
+  محدد (للمسؤول فقط)، حذف التذكرة (للمسؤول فقط)، وإضافة تعليق (التعليقات
+  الداخلية فقط للفنيين والمسؤولين).
 - `KnowledgeArticlesController` — عرض المقالات المعتمدة.
 - `UsersController` (للمسؤول فقط) — عرض المستخدمين وإنشاء مستخدم بأي دور.
 
@@ -393,26 +447,33 @@ SQL Server محلية (`SQLEXPRESS`).
 ## ٦. الواجهة الأمامية (`frontend/`)
 
 React + TypeScript + Vite، مصمَّمة باستخدام **Tailwind CSS v4** ومكوّنات
-**shadcn/ui**، ومنظَّمة خلف شريط جانبي أيسر قابل للطي
+**shadcn/ui**، ومنظَّمة خلف شريط جانبي قابل للطي
 (`react-router-dom` للتنقل بين الصفحات).
 
-**لغة التصميم**: زوايا حادة في كل مكان (`--radius: 0`)، لوحات زجاجية
-شفافة (Glassmorphism) بخلفية ضبابية (بطاقات/شريط جانبي/نوافذ منبثقة شبه
-شفافة) فوق خلفية مسطحة محايدة (بلا ألوان) مع تدرج عمق خفيف — تم اختيار
-هذا بعد التراجع عن نسخة سابقة أكثر تلوّنًا بناءً على ملاحظة أنها بدت
-"صاخبة" بالنسبة لتصميم بسيط (Minimalist).
+**لغة التصميم**: بسيطة وبأسلوب أقرب إلى تصميم Apple — أسطح مسطحة غير
+شفافة (بلا ضبابية أو زجاجية) بظل ناعم واحد؛ زوايا دائرية ناعمة ومتّسقة
+(`0.75rem`) للبطاقات والأزرار وحقول الإدخال؛ لون تمييز واحد مقيَّد (أزرق
+النظام) يُستخدم فقط للأزرار الأساسية والروابط وحالة التنقل النشطة وحلقات
+التركيز، بينما يبقى كل شيء آخر بتدرجات رمادية محايدة؛ وخط بنمط
+`-apple-system` / SF Pro / Segoe UI. هذا استبدل نسخة سابقة استخدمت زوايا
+حادة في كل مكان ولوحات زجاجية (Glassmorphism) فوق تدرج لوني بارز
+(indigo→violet→fuchsia) مع أيقونات `Sparkles` في كل مكان — تم التخلي عنها
+لأنها بدت وكأنها "تطبيق مولَّد بالذكاء الاصطناعي" أكثر من كونها تصميم
+منتج مدروس.
 
 **الصفحات** (`frontend/src/pages/`):
 - `Assistant` (الصفحة الرئيسية `/`) — تدفق العرض الأساسي: وصف المشكلة،
   رؤية الفئة المتوقعة وأفضل 3 مقالات مطابقة، والتصعيد كتذكرة عند الحاجة.
-- `Tickets` (`/tickets`) — "المستخدم" يرى تذاكره فقط ("تذاكري")؛
-  "الفني"/"المسؤول" يريان كل التذاكر ("قائمة انتظار التذاكر"). النقر على
-  صف يفتح صفحة تفاصيل التذكرة.
+- `Tickets` (`/tickets`) — "المستخدم" يرى تذاكره فقط ("تذاكري")؛ "المسؤول"
+  يرى كل التذاكر ("قائمة التذاكر")؛ أما "الفني" فيرى فقط التذاكر التي
+  وجّهها إليه مسؤول ("المسندة إليك")، وليس قائمة انتظار مشتركة أبدًا.
+  النقر على صف يفتح صفحة تفاصيل التذكرة.
 - `TicketDetail` (`/tickets/:id`) — تفاصيل المشكلة، سجل الحالات، وسلسلة
   التعليقات (يمكن للفني وضع علامة "داخلي" على تعليق فلا يراه مُبلّغ
-  التذكرة). يرى "الفني" إضافيًا زر "تعيين لي" وأداة تغيير الحالة وخانة
-  التعليق الداخلي؛ بينما يرى "المسؤول" بدلاً من ذلك أداة "إعادة تعيين"
-  لتوجيه التذكرة إلى فني محدد — بما يعكس فصل المهام في الواجهة الخلفية.
+  التذكرة). يرى "الفني" أداة تغيير الحالة وخانة التعليق الداخلي؛ بينما
+  يرى "المسؤول" أداة "إعادة تعيين" لتوجيه التذكرة إلى فني محدد وزر "حذف
+  التذكرة" — بما يعكس فصل المهام وصلاحية الـCRUD الكاملة للمسؤول في
+  الواجهة الخلفية.
 - `KnowledgeBase` (`/knowledge-base`) — قائمة قابلة للبحث تضم كل المقالات
   الأربعين المعتمدة.
 - `Login` / `Register` (`/login`، `/register`) — صفحة الدخول تعرض بريد كل
@@ -427,6 +488,19 @@ React + TypeScript + Vite، مصمَّمة باستخدام **Tailwind CSS v4** 
 إلى صفحة مقيَّدة بدور معين (مثل `/users`) دون صلاحية؛ ويحدث تسجيل خروج
 تلقائي إذا أعادت الواجهة الخلفية استجابة 401 (مثلاً عند انتهاء صلاحية
 الرمز).
+
+**واجهة ثنائية اللغة / دعم RTL** (`frontend/src/i18n.tsx`): زر تبديل اللغة
+(English ⇄ العربية) يظهر في كل صفحة، بما فيها صفحتا الدخول والتسجيل. تبديل
+اللغة يعيد رسم نص كل صفحة من قاموس ترجمة واحد، ويضبط `dir="rtl"`/
+`lang="ar"` على `<html>`، مع حفظ الاختيار في `localStorage`. العناصر
+المرتبطة بالاتجاه (أيقونة إظهار كلمة المرور، أيقونة البحث، زر إغلاق
+النوافذ المنبثقة، حدّ عنصر التنقل النشط) تستخدم خصائص CSS منطقية
+(`start-`/`end-`/`ps-`/`pe-`) بدلاً من `left`/`right` الفعليّين، لذا تُعكَس
+بشكل صحيح بدل أن تبقى عالقة على جهة واحدة. الشريط الجانبي نفسه ينتقل من
+`side="left"` إلى `side="right"` عند تفعيل العربية — سواء الشريط الثابت
+على الحاسوب أو القائمة المنبثقة على الجوال — لأن بداية القراءة بالعربية
+من اليمين. تم التحقق من عدم وجود تمرير أفقي على مستوى الصفحة بعرض
+375/768/1280 بكسل في كلتا اللغتين.
 
 ## ٧. كيفية التشغيل محليًا
 
@@ -465,7 +539,19 @@ npm run dev
 - تم التحقق من فصل المهام بين المسؤول والفني (إعادة التعيين مقابل الحل)
   فعليًا عبر المتصفح: قيام مسؤول بإعادة تعيين تذكرة لفني
   (`PATCH /api/tickets/{id}/reassign`، استجابة 200)، ثم تحقق أن ذلك الفني
-  يرى أدوات الحل (تعيين/تغيير الحالة/تعليق داخلي) التي لا يملكها المسؤول.
+  يرى أدوات الحل (تغيير الحالة/تعليق داخلي) التي لا يملكها المسؤول.
+- تم التحقق من نموذج الرؤية المرتبط بالإسناد بتشغيل سكربت فعلي على الـAPI
+  الحيّ يغطي دورة الحياة كاملة: تذكرة المستخدم غير مرئية لفني غير مُسند
+  إليها (تُستبعد من القائمة، وطلب GET المباشر يعيد 403)؛ يعيد المسؤول
+  إسنادها؛ يراها الفني حينها ويستطيع تحديث حالتها؛ نقطة الوصول القديمة
+  للتعيين الذاتي لم تعد موجودة (404)؛ يرى المُبلّغ تعليق الفني العلني لكن
+  لا يرى أبدًا تعليقًا داخليًا؛ يحذف المسؤول التذكرة (204) فتختفي (404 عند
+  طلب GET لاحق)؛ ومحاولة حذف من غير المسؤول تُرفض (403).
+- تم التحقق من زر تبديل اللغة وتخطيط RTL عبر المتصفح في كلتا اللغتين:
+  ترجمة النص بالكامل، تبديل `dir`/`lang`، وعدم وجود تمرير أفقي على مستوى
+  الصفحة بعرض الجوال/الجهاز اللوحي/الحاسوب — بما في ذلك انتقال الشريط
+  الجانبي بشكل صحيح إلى الجهة الأخرى (الشريط الثابت والقائمة المنبثقة على
+  الجوال) عند تفعيل العربية.
 
 ## ٩. ما لم يُبنَ بعد (بصراحة)
 
@@ -489,6 +575,9 @@ npm run dev
   — مقبول لمشروع دراسي/تطويري محلي، لكن أي نشر إنتاجي حقيقي يجب أن
   يستبدله بسرّ حقيقي (متغير بيئة / user-secrets / خزنة مفاتيح)، وليس
   قيمة مرفوعة في المستودع.
+- زر تبديل اللغة يغطي نصوص واجهة المستخدم فقط (إنجليزي/عربي)؛ لا يُترجم
+  التواريخ أو الأرقام أو المحتوى نفسه (مقالات قاعدة المعرفة وأوصاف
+  المشاكل ثنائية اللغة أصلًا كبيانات).
 
 ## ١٠. خريطة المستودع
 
