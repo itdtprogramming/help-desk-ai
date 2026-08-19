@@ -9,16 +9,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { useLanguage, type TranslationKey } from '@/i18n'
 
-const DEMO_ACCOUNTS = [
-  { role: 'User', email: 'user@smarthelp.local' },
-  { role: 'Technician', email: 'tech@smarthelp.local' },
-  { role: 'Admin', email: 'admin@smarthelp.local' },
+const DEMO_ACCOUNTS: { roleKey: TranslationKey; email: string }[] = [
+  { roleKey: 'role.User', email: 'user@smarthelp.local' },
+  { roleKey: 'role.Technician', email: 'tech@smarthelp.local' },
+  { roleKey: 'role.Admin', email: 'admin@smarthelp.local' },
 ]
 const DEMO_PASSWORD = 'Passw0rd!'
 
 export function Login() {
   const { login } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,7 +33,7 @@ export function Login() {
       await login(loginEmail, loginPassword)
       navigate('/')
     } catch (err) {
-      toast.error('Login failed', {
+      toast.error(t('login.failed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -54,13 +56,13 @@ export function Login() {
     <AuthLayout>
       <Card className="border-none bg-transparent shadow-none">
         <CardHeader className="px-0">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to continue to SmartHelp AI.</CardDescription>
+          <CardTitle className="text-2xl">{t('login.welcomeBack')}</CardTitle>
+          <CardDescription>{t('login.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-5 px-0">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -71,7 +73,7 @@ export function Login() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('common.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -80,13 +82,13 @@ export function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
+                  className="pe-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute top-1/2 end-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -94,35 +96,35 @@ export function Login() {
             </div>
             <Button type="submit" disabled={loading} className="mt-1">
               {loading && <Loader2 className="animate-spin" />}
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('login.signingIn') : t('login.signIn')}
             </Button>
           </form>
 
           <div className="flex items-center gap-3">
             <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">or try a demo account</span>
+            <span className="text-xs text-muted-foreground">{t('login.orDemo')}</span>
             <Separator className="flex-1" />
           </div>
 
           <div className="grid grid-cols-3 gap-2">
             {DEMO_ACCOUNTS.map((a) => (
               <Button
-                key={a.role}
+                key={a.roleKey}
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={loading}
                 onClick={() => handleDemoLogin(a.email)}
               >
-                {a.role}
+                {t(a.roleKey)}
               </Button>
             ))}
           </div>
 
           <p className="text-center text-sm text-muted-foreground">
-            No account?{' '}
+            {t('login.noAccount')}{' '}
             <Link to="/register" className="text-foreground underline underline-offset-4">
-              Register
+              {t('login.register')}
             </Link>
           </p>
         </CardContent>

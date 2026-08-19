@@ -29,14 +29,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useLanguage, type TranslationKey } from '@/i18n'
 
-const ROLE_OPTIONS = [
-  { id: 1, name: 'Admin' },
-  { id: 2, name: 'Technician' },
-  { id: 3, name: 'User' },
+const ROLE_OPTIONS: { id: number; nameKey: TranslationKey }[] = [
+  { id: 1, nameKey: 'role.Admin' },
+  { id: 2, nameKey: 'role.Technician' },
+  { id: 3, nameKey: 'role.User' },
 ]
 
 export function Users() {
+  const { t } = useLanguage()
   const [users, setUsers] = useState<AppUser[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -61,14 +63,14 @@ export function Users() {
     setCreating(true)
     try {
       await backendApi.createUser({ fullName, email, password, roleId: Number(roleId) })
-      toast.success('User created')
+      toast.success(t('users.created'))
       setDialogOpen(false)
       setFullName('')
       setEmail('')
       setPassword('')
       refresh()
     } catch (err) {
-      toast.error('Failed to create user', {
+      toast.error(t('users.createFailed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -80,27 +82,24 @@ export function Users() {
     <>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage accounts and roles. Self-registration always creates a plain "User" account —
-            Technician and Admin accounts are created here.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('users.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('users.subtitle')}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button>New user</Button>
+            <Button>{t('users.newUser')}</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create user</DialogTitle>
+              <DialogTitle>{t('users.createTitle')}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="new-fullname">Full name</Label>
+                <Label htmlFor="new-fullname">{t('common.fullName')}</Label>
                 <Input id="new-fullname" value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="new-email">Email</Label>
+                <Label htmlFor="new-email">{t('common.email')}</Label>
                 <Input
                   id="new-email"
                   type="email"
@@ -109,7 +108,7 @@ export function Users() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="new-password">Password</Label>
+                <Label htmlFor="new-password">{t('common.password')}</Label>
                 <Input
                   id="new-password"
                   type="password"
@@ -118,7 +117,7 @@ export function Users() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Role</Label>
+                <Label>{t('users.role')}</Label>
                 <Select value={roleId} onValueChange={setRoleId}>
                   <SelectTrigger>
                     <SelectValue />
@@ -126,7 +125,7 @@ export function Users() {
                   <SelectContent>
                     {ROLE_OPTIONS.map((r) => (
                       <SelectItem key={r.id} value={String(r.id)}>
-                        {r.name}
+                        {t(r.nameKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -138,7 +137,7 @@ export function Users() {
                 onClick={handleCreate}
                 disabled={creating || !fullName.trim() || !email.trim() || !password.trim()}
               >
-                {creating ? 'Creating…' : 'Create'}
+                {creating ? t('users.creating') : t('users.create')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -147,20 +146,20 @@ export function Users() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All users</CardTitle>
+          <CardTitle>{t('users.allUsers')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('users.name')}</TableHead>
+                  <TableHead>{t('common.email')}</TableHead>
+                  <TableHead>{t('users.role')}</TableHead>
+                  <TableHead>{t('users.department')}</TableHead>
+                  <TableHead>{t('users.status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -170,11 +169,11 @@ export function Users() {
                     <TableCell>{u.email}</TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {ROLE_OPTIONS.find((r) => r.id === u.roleId)?.name ?? u.roleId}
+                        {t(ROLE_OPTIONS.find((r) => r.id === u.roleId)?.nameKey ?? 'role.User')}
                       </Badge>
                     </TableCell>
                     <TableCell>{u.department ?? '—'}</TableCell>
-                    <TableCell>{u.isActive ? 'Active' : 'Disabled'}</TableCell>
+                    <TableCell>{u.isActive ? t('users.active') : t('users.disabled')}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

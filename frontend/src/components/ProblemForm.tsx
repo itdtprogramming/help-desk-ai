@@ -1,8 +1,9 @@
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/i18n'
 
 interface ProblemFormProps {
   value: string
@@ -12,10 +13,12 @@ interface ProblemFormProps {
 }
 
 export function ProblemForm({ value, onChange, onSubmit, loading }: ProblemFormProps) {
+  const { t } = useLanguage()
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Describe your problem</CardTitle>
+        <CardTitle>{t('problemForm.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -26,7 +29,7 @@ export function ProblemForm({ value, onChange, onSubmit, loading }: ProblemFormP
           }}
         >
           <div className="flex flex-col gap-2">
-            <Label htmlFor="problem">Arabic or English — mix freely</Label>
+            <Label htmlFor="problem">{t('problemForm.label')}</Label>
             <Textarea
               id="problem"
               dir="auto"
@@ -40,12 +43,12 @@ export function ProblemForm({ value, onChange, onSubmit, loading }: ProblemFormP
             {loading ? (
               <>
                 <Loader2 className="animate-spin" />
-                Analyzing…
+                {t('problemForm.analyzing')}
               </>
             ) : (
               <>
-                <Sparkles />
-                Ask SmartHelp AI
+                <Send />
+                {t('problemForm.submit')}
               </>
             )}
           </Button>

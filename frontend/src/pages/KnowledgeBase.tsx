@@ -4,8 +4,10 @@ import { backendApi, type KnowledgeArticle } from '@/api'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useLanguage, type TranslationKey } from '@/i18n'
 
 export function KnowledgeBase() {
+  const { t } = useLanguage()
   const [articles, setArticles] = useState<KnowledgeArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
@@ -33,26 +35,24 @@ export function KnowledgeBase() {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Knowledge Base</h1>
-        <p className="text-sm text-muted-foreground">
-          Approved articles the assistant retrieves solutions from.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('kb.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('kb.subtitle')}</p>
       </div>
 
       <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by problem, category, or KB id…"
-          className="pl-9"
+          placeholder={t('kb.searchPlaceholder')}
+          className="ps-9"
         />
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No matching articles.</p>
+        <p className="text-sm text-muted-foreground">{t('kb.noMatches')}</p>
       ) : (
         <div className="grid gap-3">
           {filtered.map((a) => (
@@ -60,7 +60,7 @@ export function KnowledgeBase() {
               <CardContent className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span className="font-mono font-semibold text-foreground">{a.id}</span>
-                  <Badge variant="outline">{a.category}</Badge>
+                  <Badge variant="outline">{t(`category.${a.category}` as TranslationKey)}</Badge>
                 </div>
                 <p className="font-medium" dir="auto">
                   {a.problemEn} / {a.problemAr}

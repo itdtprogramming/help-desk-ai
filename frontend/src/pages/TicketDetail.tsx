@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage, type TranslationKey } from '@/i18n'
 
 const STATUSES = ['New', 'InProgress', 'Escalated', 'Resolved', 'Closed']
 
@@ -24,9 +25,11 @@ export function TicketDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  // Separation of duties: Technician does resolution work (assign, status,
-  // internal notes); Admin governs routing (reassign) but doesn't personally
-  // resolve tickets. See backend/Controllers/TicketsController.cs.
+  const { t } = useLanguage()
+  // Separation of duties: Technician does resolution work (status, internal
+  // notes); Admin governs routing (reassign) and record-level CRUD (delete)
+  // but doesn't personally resolve tickets. A ticket is only ever visible
+  // here if the backend already granted access — see TicketsController.cs.
   const isTechnician = user?.role === 'Technician'
   const isAdmin = user?.role === 'Admin'
 
@@ -51,11 +54,11 @@ export function TicketDetail() {
         setNextStatus(t.status)
       })
       .catch(() => {
-        toast.error('Could not load ticket')
+        toast.error(t('ticketDetail.loadFailed'))
         navigate('/tickets')
       })
       .finally(() => setLoading(false))
-  }, [id, refreshKey, navigate])
+  }, [id, refreshKey, navigate, t])
 
   useEffect(() => {
     if (!isAdmin) return
@@ -69,31 +72,15 @@ export function TicketDetail() {
     setRefreshKey((k) => k + 1)
   }
 
-  async function handleAssign() {
-    if (!ticket) return
-    setBusy(true)
-    try {
-      await backendApi.assignTicketToSelf(ticket.id)
-      toast.success('Ticket assigned to you')
-      reload()
-    } catch (err) {
-      toast.error('Failed to assign ticket', {
-        description: err instanceof Error ? err.message : undefined,
-      })
-    } finally {
-      setBusy(false)
-    }
-  }
-
   async function handleReassign() {
     if (!ticket || !reassignTo) return
     setBusy(true)
     try {
       await backendApi.reassignTicket(ticket.id, Number(reassignTo))
-      toast.success('Ticket reassigned')
+      toast.success(t('ticketDetail.reassigned'))
       reload()
     } catch (err) {
-      toast.error('Failed to reassign ticket', {
+      toast.error(t('ticketDetail.reassignFailed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -107,10 +94,10 @@ export function TicketDetail() {
     try {
       await backendApi.updateTicketStatus(ticket.id, nextStatus, statusNote || undefined)
       setStatusNote('')
-      toast.success(`Status updated to ${nextStatus}`)
+      toast.success(t('ticketDetail.statusUpdated', { status: t(`status.${nextStatus}` as TranslationKey) }))
       reload()
     } catch (err) {
-      toast.error('Failed to update status', {
+      toast.error(t('ticketDetail.statusFailed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -127,7 +114,7 @@ export function TicketDetail() {
       setCommentInternal(false)
       reload()
     } catch (err) {
-      toast.error('Failed to add comment', {
+      toast.error(t('ticketDetail.commentFailed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -135,8 +122,24 @@ export function TicketDetail() {
     }
   }
 
+  async function handleDelete() {
+    if (!ticket) return
+    if (!window.confirm(t('ticketDetail.deleteConfirm'))) return
+    setBusy(true)
+    try {
+      await backendApi.deleteTicket(ticket.id)
+      toast.success(t('ticketDetail.deleted'))
+      navigate('/tickets')
+    } catch (err) {
+      toast.error(t('ticketDetail.deleteFailed'), {
+        description: err instanceof Error ? err.message : undefined,
+      })
+      setBusy(false)
+    }
+  }
+
   if (loading) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
   }
   if (!ticket) {
     return null
@@ -150,21 +153,21 @@ export function TicketDetail() {
             {ticket.displayCode}
           </h1>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <Badge variant="default">{ticket.status}</Badge>
-            <Badge variant="secondary">{ticket.category}</Badge>
-            <Badge variant="outline">{ticket.priority}</Badge>
+            <Badge variant="default">{t(`status.${ticket.status}` as TranslationKey)}</Badge>
+            <Badge variant="secondary">{t(`category.${ticket.category}` as TranslationKey)}</Badge>
+            <Badge variant="outline">{t(`priority.${ticket.priority}` as TranslationKey)}</Badge>
           </div>
         </div>
-        {isTechnician && (
-          <Button variant="outline" onClick={handleAssign} disabled={busy}>
-            {ticket.assignedTechnicianId === user?.userId ? 'Assigned to you' : 'Assign to me'}
+        {isAdmin && (
+          <Button variant="destructive" onClick={handleDelete} disabled={busy}>
+            {t('ticketDetail.deleteTicket')}
           </Button>
         )}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Problem</CardTitle>
+          <CardTitle>{t('ticketDetail.problem')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <p dir="auto">{ticket.problemDescription}</p>
@@ -177,7 +180,7 @@ export function TicketDetail() {
       {isTechnician && (
         <Card>
           <CardHeader>
-            <CardTitle>Update status</CardTitle>
+            <CardTitle>{t('ticketDetail.updateStatus')}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -188,7 +191,7 @@ export function TicketDetail() {
                 <SelectContent>
                   {STATUSES.map((s) => (
                     <SelectItem key={s} value={s}>
-                      {s}
+                      {t(`status.${s}` as TranslationKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -197,11 +200,11 @@ export function TicketDetail() {
                 onClick={handleStatusUpdate}
                 disabled={busy || nextStatus === ticket.status}
               >
-                Update
+                {t('ticketDetail.update')}
               </Button>
             </div>
             <Textarea
-              placeholder="Optional note about this change"
+              placeholder={t('ticketDetail.notePlaceholder')}
               value={statusNote}
               onChange={(e) => setStatusNote(e.target.value)}
               rows={2}
@@ -213,23 +216,23 @@ export function TicketDetail() {
       {isAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle>Reassign</CardTitle>
+            <CardTitle>{t('ticketDetail.reassign')}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap items-center gap-2">
             <Select value={reassignTo} onValueChange={setReassignTo}>
               <SelectTrigger className="w-56">
-                <SelectValue placeholder="Choose a technician" />
+                <SelectValue placeholder={t('ticketDetail.chooseTechnician')} />
               </SelectTrigger>
               <SelectContent>
-                {technicians.map((t) => (
-                  <SelectItem key={t.id} value={String(t.id)}>
-                    {t.fullName}
+                {technicians.map((tech) => (
+                  <SelectItem key={tech.id} value={String(tech.id)}>
+                    {tech.fullName}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Button onClick={handleReassign} disabled={busy || !reassignTo}>
-              Reassign
+              {t('ticketDetail.reassign')}
             </Button>
           </CardContent>
         </Card>
@@ -237,18 +240,20 @@ export function TicketDetail() {
 
       <Card>
         <CardHeader>
-          <CardTitle>History</CardTitle>
+          <CardTitle>{t('ticketDetail.history')}</CardTitle>
         </CardHeader>
         <CardContent>
           {ticket.statusHistory.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No status changes yet.</p>
+            <p className="text-sm text-muted-foreground">{t('ticketDetail.noHistory')}</p>
           ) : (
             <ul className="flex flex-col gap-2 text-sm">
               {ticket.statusHistory.map((h) => (
                 <li key={h.id} className="flex flex-col">
                   <span>
-                    <span className="text-muted-foreground">{h.oldStatus} → </span>
-                    <span className="font-medium">{h.newStatus}</span>
+                    <span className="text-muted-foreground">
+                      {t(`status.${h.oldStatus}` as TranslationKey)} →{' '}
+                    </span>
+                    <span className="font-medium">{t(`status.${h.newStatus}` as TranslationKey)}</span>
                   </span>
                   {h.note && <span className="text-muted-foreground">{h.note}</span>}
                 </li>
@@ -260,17 +265,17 @@ export function TicketDetail() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Comments</CardTitle>
+          <CardTitle>{t('ticketDetail.comments')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {ticket.comments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No comments yet.</p>
+            <p className="text-sm text-muted-foreground">{t('ticketDetail.noComments')}</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {ticket.comments.map((c) => (
                 <li key={c.id} className="rounded-lg border p-3 text-sm">
                   <div className="mb-1 flex items-center gap-2">
-                    {c.isInternal && <Badge variant="outline">internal</Badge>}
+                    {c.isInternal && <Badge variant="outline">{t('ticketDetail.internal')}</Badge>}
                   </div>
                   <p dir="auto">{c.body}</p>
                 </li>
@@ -281,7 +286,7 @@ export function TicketDetail() {
           <Separator />
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="comment">Add a comment</Label>
+            <Label htmlFor="comment">{t('ticketDetail.addComment')}</Label>
             <Textarea
               id="comment"
               dir="auto"
@@ -289,13 +294,13 @@ export function TicketDetail() {
               value={commentBody}
               onChange={(e) => setCommentBody(e.target.value)}
             />
-            {isTechnician && (
+            {(isTechnician || isAdmin) && (
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Checkbox
                   checked={commentInternal}
                   onCheckedChange={(v) => setCommentInternal(v === true)}
                 />
-                Internal note (not shown to the reporter)
+                {t('ticketDetail.internalNote')}
               </label>
             )}
             <Button
@@ -303,7 +308,7 @@ export function TicketDetail() {
               disabled={busy || !commentBody.trim()}
               className="self-start"
             >
-              Post comment
+              {t('ticketDetail.postComment')}
             </Button>
           </div>
         </CardContent>

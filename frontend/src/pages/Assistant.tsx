@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { aiApi, backendApi, type ClassifyResponse, type RetrieveResponse } from '@/api'
 import { AnalysisResult, AnalysisResultSkeleton } from '@/components/AnalysisResult'
 import { ProblemForm } from '@/components/ProblemForm'
+import { useLanguage } from '@/i18n'
 
 type AnalysisState =
   | { status: 'idle' }
@@ -11,6 +12,7 @@ type AnalysisState =
   | { status: 'done'; classification: ClassifyResponse; retrieval: RetrieveResponse }
 
 export function Assistant() {
+  const { t } = useLanguage()
   const [problemText, setProblemText] = useState('')
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'idle' })
   const [escalating, setEscalating] = useState(false)
@@ -26,9 +28,9 @@ export function Assistant() {
       ])
       setAnalysis({ status: 'done', classification, retrieval })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'AI service unavailable'
+      const message = err instanceof Error ? err.message : t('assistant.aiUnavailable')
       setAnalysis({ status: 'error', message })
-      toast.error('Could not reach the AI service', { description: message })
+      toast.error(t('assistant.aiUnavailable'), { description: message })
     }
   }
 
@@ -39,11 +41,11 @@ export function Assistant() {
         problemDescription: problemText,
         category,
       })
-      toast.success(`Ticket ${ticket.displayCode} created`, {
-        description: `Status: ${ticket.status}`,
+      toast.success(t('assistant.ticketCreated', { code: ticket.displayCode }), {
+        description: t('assistant.status', { status: ticket.status }),
       })
     } catch (err) {
-      toast.error('Failed to create ticket', {
+      toast.error(t('assistant.ticketFailed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -54,10 +56,8 @@ export function Assistant() {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Assistant</h1>
-        <p className="text-sm text-muted-foreground">
-          Describe a problem to get a suggested solution from the approved knowledge base.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('assistant.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('assistant.subtitle')}</p>
       </div>
 
       <ProblemForm

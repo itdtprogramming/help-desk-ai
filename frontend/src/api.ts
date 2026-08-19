@@ -191,14 +191,14 @@ export const backendApi = {
       body: JSON.stringify({ newStatus, note }),
     }).then((r) => asJson<Ticket>(r)),
 
-  assignTicketToSelf: (id: number) =>
-    authedFetch(`/api/tickets/${id}/assign`, { method: 'PATCH' }).then((r) => asJson<Ticket>(r)),
-
   reassignTicket: (id: number, technicianUserId: number) =>
     authedFetch(`/api/tickets/${id}/reassign`, {
       method: 'PATCH',
       body: JSON.stringify({ technicianUserId }),
     }).then((r) => asJson<Ticket>(r)),
+
+  deleteTicket: (id: number) =>
+    authedFetch(`/api/tickets/${id}`, { method: 'DELETE' }).then((r) => asJson<void>(r)),
 
   addTicketComment: (id: number, body: string, isInternal = false) =>
     authedFetch(`/api/tickets/${id}/comments`, {

@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/i18n'
 
 export function Register() {
   const { register } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -25,7 +27,7 @@ export function Register() {
       await register({ fullName, email, password })
       navigate('/')
     } catch (err) {
-      toast.error('Registration failed', {
+      toast.error(t('register.failed'), {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -37,13 +39,13 @@ export function Register() {
     <AuthLayout>
       <Card className="border-none bg-transparent shadow-none">
         <CardHeader className="px-0">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>New accounts are always plain "User" accounts.</CardDescription>
+          <CardTitle className="text-2xl">{t('register.title')}</CardTitle>
+          <CardDescription>{t('register.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="px-0">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="fullName">Full name</Label>
+              <Label htmlFor="fullName">{t('common.fullName')}</Label>
               <Input
                 id="fullName"
                 autoComplete="name"
@@ -53,7 +55,7 @@ export function Register() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -64,7 +66,7 @@ export function Register() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('common.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -74,13 +76,13 @@ export function Register() {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
+                  className="pe-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute top-1/2 end-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -88,13 +90,13 @@ export function Register() {
             </div>
             <Button type="submit" disabled={loading} className="mt-1">
               {loading && <Loader2 className="animate-spin" />}
-              {loading ? 'Creating account…' : 'Register'}
+              {loading ? t('register.submitting') : t('register.submit')}
             </Button>
           </form>
           <p className="mt-5 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <Link to="/login" className="text-foreground underline underline-offset-4">
-              Sign in
+              {t('register.signIn')}
             </Link>
           </p>
         </CardContent>

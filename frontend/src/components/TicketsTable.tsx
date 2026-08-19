@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useLanguage, type TranslationKey } from '@/i18n'
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
   New: 'default',
@@ -19,41 +20,44 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
   Closed: 'outline',
 }
 
-export function TicketsTable({ tickets, title = 'Recent tickets' }: { tickets: Ticket[]; title?: string }) {
+export function TicketsTable({ tickets, title }: { tickets: Ticket[]; title?: string }) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>{title ?? t('ticketsTable.recent')}</CardTitle>
       </CardHeader>
       <CardContent>
         {tickets.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No tickets yet.</p>
+          <p className="text-sm text-muted-foreground">{t('ticketsTable.noTickets')}</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Problem</TableHead>
+                <TableHead>{t('ticketsTable.code')}</TableHead>
+                <TableHead>{t('ticketsTable.category')}</TableHead>
+                <TableHead>{t('ticketsTable.status')}</TableHead>
+                <TableHead>{t('ticketsTable.problem')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tickets.map((t) => (
+              {tickets.map((ticket) => (
                 <TableRow
-                  key={t.id}
+                  key={ticket.id}
                   className="cursor-pointer"
-                  onClick={() => navigate(`/tickets/${t.id}`)}
+                  onClick={() => navigate(`/tickets/${ticket.id}`)}
                 >
-                  <TableCell className="font-mono">{t.displayCode}</TableCell>
-                  <TableCell>{t.category}</TableCell>
+                  <TableCell className="font-mono">{ticket.displayCode}</TableCell>
+                  <TableCell>{t(`category.${ticket.category}` as TranslationKey)}</TableCell>
                   <TableCell>
-                    <Badge variant={STATUS_VARIANT[t.status] ?? 'default'}>{t.status}</Badge>
+                    <Badge variant={STATUS_VARIANT[ticket.status] ?? 'default'}>
+                      {t(`status.${ticket.status}` as TranslationKey)}
+                    </Badge>
                   </TableCell>
                   <TableCell className="max-w-xs truncate" dir="auto">
-                    {t.problemDescription}
+                    {ticket.problemDescription}
                   </TableCell>
                 </TableRow>
               ))}
