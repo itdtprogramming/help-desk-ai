@@ -1,11 +1,13 @@
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAuth } from '@/auth'
+import { AuthLayout } from '@/components/AuthLayout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export function Register() {
   const { register } = useAuth()
@@ -13,6 +15,7 @@ export function Register() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -31,18 +34,19 @@ export function Register() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Create an account</CardTitle>
+    <AuthLayout>
+      <Card className="border-none bg-transparent shadow-none">
+        <CardHeader className="px-0">
+          <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>New accounts are always plain "User" accounts.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
               <Label htmlFor="fullName">Full name</Label>
               <Input
                 id="fullName"
+                autoComplete="name"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -53,6 +57,7 @@ export function Register() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -60,20 +65,33 @@ export function Register() {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="mt-1">
+              {loading && <Loader2 className="animate-spin" />}
               {loading ? 'Creating account…' : 'Register'}
             </Button>
           </form>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link to="/login" className="text-foreground underline underline-offset-4">
               Sign in
@@ -81,6 +99,6 @@ export function Register() {
           </p>
         </CardContent>
       </Card>
-    </div>
+    </AuthLayout>
   )
 }
