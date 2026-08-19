@@ -34,6 +34,15 @@ public class TicketsController : ControllerBase
     private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     private bool IsTechnicianOrAdmin => User.IsInRole("Technician") || User.IsInRole("Admin");
 
+    // A ticket is visible to: the reporter, an Admin (sees everything), or
+    // the Technician it is currently assigned to. A Technician a ticket has
+    // not been routed to cannot see it at all — assignment is what grants
+    // access, not the role by itself.
+    private bool CanAccessTicket(Ticket ticket) =>
+        User.IsInRole("Admin") ||
+        ticket.ReportedByUserId == CurrentUserId ||
+        (User.IsInRole("Technician") && ticket.AssignedTechnicianId == CurrentUserId);
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Ticket>>> GetAll(
         [FromQuery] string? status,
@@ -42,9 +51,14 @@ public class TicketsController : ControllerBase
     {
         var query = _db.Tickets.AsQueryable();
 
-        // Plain "User" accounts only ever see the tickets they reported;
-        // the technician queue (all tickets) is restricted to staff roles.
-        if (!IsTechnicianOrAdmin)
+        // Admin sees every ticket. A User only ever sees what they reported.
+        // A Technician only sees tickets an Admin has routed to them —
+        // there is no shared "queue" of unassigned work to browse.
+        if (User.IsInRole("Technician"))
+        {
+            query = query.Where(t => t.AssignedTechnicianId == CurrentUserId);
+        }
+        else if (!User.IsInRole("Admin"))
         {
             query = query.Where(t => t.ReportedByUserId == CurrentUserId);
         }
@@ -81,9 +95,17 @@ public class TicketsController : ControllerBase
             return NotFound();
         }
 
-        if (!IsTechnicianOrAdmin && ticket.ReportedByUserId != CurrentUserId)
+        if (!CanAccessTicket(ticket))
         {
             return Forbid();
+        }
+
+        // Internal notes are staff-only; a reporter viewing their own ticket
+        // never sees them, regardless of who wrote them.
+        bool isStaffForThisTicket = User.IsInRole("Admin") || ticket.AssignedTechnicianId == CurrentUserId;
+        if (!isStaffForThisTicket)
+        {
+            ticket.Comments = ticket.Comments.Where(c => !c.IsInternal).ToList();
         }
 
         return ticket;
@@ -126,6 +148,11 @@ public class TicketsController : ControllerBase
             return NotFound();
         }
 
+        if (ticket.AssignedTechnicianId != CurrentUserId)
+        {
+            return Forbid();
+        }
+
         _db.TicketStatusHistories.Add(new TicketStatusHistory
         {
             TicketId = ticket.Id,
@@ -146,31 +173,10 @@ public class TicketsController : ControllerBase
         return ticket;
     }
 
-    [HttpPatch("{id:int}/assign")]
-    [Authorize(Roles = "Technician")]
-    public async Task<ActionResult<Ticket>> AssignToSelf(int id)
-    {
-        var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
-        if (ticket is null)
-        {
-            return NotFound();
-        }
-
-        ticket.AssignedTechnicianId = CurrentUserId;
-        ticket.UpdatedAt = DateTime.UtcNow;
-        if (ticket.Status == TicketStatus.New)
-        {
-            ticket.Status = TicketStatus.InProgress;
-        }
-
-        await _db.SaveChangesAsync();
-        return ticket;
-    }
-
-    // Admin-only routing action: reassign a ticket to a specific technician
-    // (as opposed to /assign, which lets a technician pick up their own
-    // work). Does not change status — reassignment is a management action,
-    // not a signal that work has started.
+    // Admin-only routing action: a Technician never sees a ticket until an
+    // Admin routes it to them, so assignment is exclusively an Admin action
+    // (there is no technician-initiated self-assign). Does not change status
+    // — reassignment is a management action, not a signal that work started.
     [HttpPatch("{id:int}/reassign")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Ticket>> Reassign(int id, ReassignTicketRequest request)
@@ -204,7 +210,7 @@ public class TicketsController : ControllerBase
             return NotFound();
         }
 
-        if (!IsTechnicianOrAdmin && ticket.ReportedByUserId != CurrentUserId)
+        if (!CanAccessTicket(ticket))
         {
             return Forbid();
         }
@@ -223,5 +229,23 @@ public class TicketsController : ControllerBase
         await _db.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetById), new { id }, comment);
+    }
+
+    // Completes Admin's CRUD authority over tickets (create is open to any
+    // authenticated reporter, read/update are covered above) — deleting a
+    // ticket record is an administrative action, not part of resolution.
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
+        if (ticket is null)
+        {
+            return NotFound();
+        }
+
+        _db.Tickets.Remove(ticket);
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 }
