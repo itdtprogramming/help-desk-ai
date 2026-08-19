@@ -6,6 +6,8 @@ import { TicketsTable } from '@/components/TicketsTable'
 export function Tickets() {
   const { user } = useAuth()
   const isStaff = user?.role === 'Technician' || user?.role === 'Admin'
+  // Both roles see the full queue (Admin for oversight, Technician to work it) —
+  // only the label differs. Actual permission split lives in TicketDetail.
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
 

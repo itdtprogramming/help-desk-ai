@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { backendApi, type TicketDetail as TicketDetailType } from '@/api'
+import { backendApi, type AppUser, type TicketDetail as TicketDetailType } from '@/api'
 import { useAuth } from '@/auth'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,11 @@ export function TicketDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const isStaff = user?.role === 'Technician' || user?.role === 'Admin'
+  // Separation of duties: Technician does resolution work (assign, status,
+  // internal notes); Admin governs routing (reassign) but doesn't personally
+  // resolve tickets. See backend/Controllers/TicketsController.cs.
+  const isTechnician = user?.role === 'Technician'
+  const isAdmin = user?.role === 'Admin'
 
   const [ticket, setTicket] = useState<TicketDetailType | null>(null)
   const [loading, setLoading] = useState(true)
@@ -34,6 +38,8 @@ export function TicketDetail() {
   const [commentInternal, setCommentInternal] = useState(false)
   const [busy, setBusy] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [technicians, setTechnicians] = useState<AppUser[]>([])
+  const [reassignTo, setReassignTo] = useState<string>('')
 
   useEffect(() => {
     if (!id) return
@@ -51,6 +57,14 @@ export function TicketDetail() {
       .finally(() => setLoading(false))
   }, [id, refreshKey, navigate])
 
+  useEffect(() => {
+    if (!isAdmin) return
+    backendApi
+      .getUsers()
+      .then((users) => setTechnicians(users.filter((u) => u.roleId === 2)))
+      .catch(() => setTechnicians([]))
+  }, [isAdmin])
+
   function reload() {
     setRefreshKey((k) => k + 1)
   }
@@ -64,6 +78,22 @@ export function TicketDetail() {
       reload()
     } catch (err) {
       toast.error('Failed to assign ticket', {
+        description: err instanceof Error ? err.message : undefined,
+      })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleReassign() {
+    if (!ticket || !reassignTo) return
+    setBusy(true)
+    try {
+      await backendApi.reassignTicket(ticket.id, Number(reassignTo))
+      toast.success('Ticket reassigned')
+      reload()
+    } catch (err) {
+      toast.error('Failed to reassign ticket', {
         description: err instanceof Error ? err.message : undefined,
       })
     } finally {
@@ -125,7 +155,7 @@ export function TicketDetail() {
             <Badge variant="outline">{ticket.priority}</Badge>
           </div>
         </div>
-        {isStaff && (
+        {isTechnician && (
           <Button variant="outline" onClick={handleAssign} disabled={busy}>
             {ticket.assignedTechnicianId === user?.userId ? 'Assigned to you' : 'Assign to me'}
           </Button>
@@ -144,7 +174,7 @@ export function TicketDetail() {
         </CardContent>
       </Card>
 
-      {isStaff && (
+      {isTechnician && (
         <Card>
           <CardHeader>
             <CardTitle>Update status</CardTitle>
@@ -176,6 +206,31 @@ export function TicketDetail() {
               onChange={(e) => setStatusNote(e.target.value)}
               rows={2}
             />
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Reassign</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center gap-2">
+            <Select value={reassignTo} onValueChange={setReassignTo}>
+              <SelectTrigger className="w-56">
+                <SelectValue placeholder="Choose a technician" />
+              </SelectTrigger>
+              <SelectContent>
+                {technicians.map((t) => (
+                  <SelectItem key={t.id} value={String(t.id)}>
+                    {t.fullName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleReassign} disabled={busy || !reassignTo}>
+              Reassign
+            </Button>
           </CardContent>
         </Card>
       )}
@@ -234,7 +289,7 @@ export function TicketDetail() {
               value={commentBody}
               onChange={(e) => setCommentBody(e.target.value)}
             />
-            {isStaff && (
+            {isTechnician && (
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Checkbox
                   checked={commentInternal}

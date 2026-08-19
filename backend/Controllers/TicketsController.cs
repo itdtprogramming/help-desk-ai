@@ -17,6 +17,8 @@ public record UpdateTicketStatusRequest(string NewStatus, string? Note);
 
 public record AddTicketCommentRequest(string Body, bool IsInternal = false);
 
+public record ReassignTicketRequest(int TechnicianUserId);
+
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
@@ -109,8 +111,13 @@ public class TicketsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = ticket.Id }, ticket);
     }
 
+    // Resolution work (status changes, self-assignment) is Technician-only —
+    // separation of duties: Admin governs users/roles/oversight and can
+    // reassign a ticket to a technician, but does not personally resolve
+    // tickets. This keeps "who is allowed to fix things" and "who fixed
+    // this ticket" on distinct, auditable roles.
     [HttpPatch("{id:int}/status")]
-    [Authorize(Roles = "Technician,Admin")]
+    [Authorize(Roles = "Technician")]
     public async Task<ActionResult<Ticket>> UpdateStatus(int id, UpdateTicketStatusRequest request)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -140,7 +147,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPatch("{id:int}/assign")]
-    [Authorize(Roles = "Technician,Admin")]
+    [Authorize(Roles = "Technician")]
     public async Task<ActionResult<Ticket>> AssignToSelf(int id)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -155,6 +162,34 @@ public class TicketsController : ControllerBase
         {
             ticket.Status = TicketStatus.InProgress;
         }
+
+        await _db.SaveChangesAsync();
+        return ticket;
+    }
+
+    // Admin-only routing action: reassign a ticket to a specific technician
+    // (as opposed to /assign, which lets a technician pick up their own
+    // work). Does not change status — reassignment is a management action,
+    // not a signal that work has started.
+    [HttpPatch("{id:int}/reassign")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<Ticket>> Reassign(int id, ReassignTicketRequest request)
+    {
+        var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
+        if (ticket is null)
+        {
+            return NotFound();
+        }
+
+        var technician = await _db.Users.Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == request.TechnicianUserId);
+        if (technician is null || technician.Role?.Name != "Technician")
+        {
+            return BadRequest("TechnicianUserId must belong to a Technician account.");
+        }
+
+        ticket.AssignedTechnicianId = technician.Id;
+        ticket.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return ticket;

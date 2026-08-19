@@ -70,10 +70,13 @@ field.
 **Authentication & authorization** (`backend/Auth/`, `AuthController`):
 - JWT bearer tokens. `POST /api/auth/login` and `POST /api/auth/register`
   issue a token containing the user's id, name, email, and role.
-- Every controller requires a valid token (`[Authorize]`); ticket-management
-  actions additionally require `Technician` or `Admin`
-  (`[Authorize(Roles = "Technician,Admin")]`); user management requires
-  `Admin` only.
+- Every controller requires a valid token (`[Authorize]`). Ticket
+  **resolution** work (change status, assign-to-self) is `Technician`-only;
+  ticket **reassignment** to a specific technician is `Admin`-only; user
+  management requires `Admin` only. This is a deliberate separation of
+  duties: an Admin governs users/roles/routing but does not personally
+  resolve tickets, so "who is allowed to fix things" and "who fixed this
+  ticket" stay on distinct, auditable roles.
 - Self-registration always creates a plain `"User"` account — Technician
   and Admin accounts can only be created by an Admin through the Users page.
 - `ReportedByUserId`, `ChangedByUserId`, and `AuthorUserId` are read from
@@ -84,8 +87,9 @@ field.
 - `AuthController` — login, register.
 - `TicketsController` — list (role-filtered: a `User` only sees their own
   tickets; `Technician`/`Admin` see everything), get by id (with status
-  history and comments), create, change status, assign-to-self, add
-  comment (internal-only comments are only possible for staff roles).
+  history and comments), create, change status (`Technician`), assign-to-self
+  (`Technician`), reassign to a specific technician (`Admin`), add comment
+  (internal-only comments are only possible for staff roles).
 - `KnowledgeArticlesController` — list/get approved articles.
 - `UsersController` (Admin-only) — list users, create a user with any role.
 
@@ -152,10 +156,12 @@ feedback that it read as noisy for a minimalist design.
 - `Tickets` (`/tickets`) — a `User` sees only their own tickets ("My
   tickets"); `Technician`/`Admin` see the full queue ("Ticket queue").
   Clicking a row opens the ticket detail page.
-- `TicketDetail` (`/tickets/:id`) — problem details, an "Assign to me"
-  button and a status-change control (staff only), status history, and a
+- `TicketDetail` (`/tickets/:id`) — problem details, status history, and a
   comment thread (staff can mark a comment "internal", hidden from the
-  reporter).
+  reporter). A `Technician` additionally sees an "Assign to me" button, a
+  status-change control, and the internal-note checkbox; an `Admin` instead
+  sees a "Reassign" control to route the ticket to a specific technician —
+  matching the backend's separation of duties.
 - `KnowledgeBase` (`/knowledge-base`) — a searchable list of all 40
   approved articles.
 - `Login` / `Register` (`/login`, `/register`) — the login page shows the
@@ -205,6 +211,11 @@ not just reading the code:
   time.
 - Retrieval and classification accuracy measured against the held-out
   eval set, not asserted.
+- The Admin/Technician separation of duties (reassign vs. resolve) verified
+  end-to-end in a browser: an Admin reassigning a ticket to a technician
+  (`PATCH /api/tickets/{id}/reassign`, 200 OK), and that technician then
+  seeing the resolution controls (assign/status/internal note) the Admin
+  does not have.
 
 ## 9. What is **not** built yet (honest gaps)
 
@@ -310,9 +321,13 @@ SQL Server محلية (`SQLEXPRESS`).
 **تسجيل الدخول والصلاحيات** (`backend/Auth/`، `AuthController`):
 - رموز JWT. تصدر `POST /api/auth/login` و `POST /api/auth/register` رمزًا
   يحتوي على معرّف المستخدم واسمه وبريده الإلكتروني ودوره.
-- كل نقطة وصول (Controller) تتطلب رمزًا صالحًا (`[Authorize]`)؛ أما
-  إجراءات إدارة التذاكر فتتطلب إضافيًا دور `Technician` أو `Admin`؛
-  وإدارة المستخدمين تتطلب `Admin` فقط.
+- كل نقطة وصول (Controller) تتطلب رمزًا صالحًا (`[Authorize]`). أعمال
+  **حل التذكرة** (تغيير الحالة، تعيينها للنفس) مقتصرة على `Technician`؛
+  أما **إعادة التوجيه** (تعيين التذكرة لفني محدد) فمقتصرة على `Admin`؛
+  وإدارة المستخدمين تتطلب `Admin` فقط. هذا فصل مقصود للمهام: المسؤول يدير
+  المستخدمين والأدوار والتوجيه لكنه لا يحل التذاكر بنفسه، بحيث تبقى "من
+  يملك صلاحية الإصلاح" و"من أصلح هذه التذكرة فعليًا" على دورين مختلفين
+  وقابلين للتدقيق.
 - التسجيل الذاتي ينشئ دائمًا حساب "User" عاديًا فقط — حسابات الفني
   والمسؤول لا يمكن إنشاؤها إلا من قبل مسؤول عبر صفحة المستخدمين.
 - يتم قراءة هوية مُبلّغ التذكرة ومن غيّر حالتها ومن كتب التعليق من رمز
@@ -323,8 +338,9 @@ SQL Server محلية (`SQLEXPRESS`).
 - `AuthController` — تسجيل الدخول والتسجيل الجديد.
 - `TicketsController` — عرض التذاكر (مُفلترة حسب الدور: "User" يرى
   تذاكره فقط، بينما "Technician"/"Admin" يريان كل التذاكر)، عرض تذكرة
-  واحدة (مع سجل الحالات والتعليقات)، إنشاء تذكرة، تغيير الحالة، تعيين
-  التذكرة لنفس الفني، وإضافة تعليق (التعليقات الداخلية فقط للفنيين
+  واحدة (مع سجل الحالات والتعليقات)، إنشاء تذكرة، تغيير الحالة (للفني
+  فقط)، تعيين التذكرة لنفس الفني (للفني فقط)، إعادة تعيين التذكرة لفني
+  محدد (للمسؤول فقط)، وإضافة تعليق (التعليقات الداخلية فقط للفنيين
   والمسؤولين).
 - `KnowledgeArticlesController` — عرض المقالات المعتمدة.
 - `UsersController` (للمسؤول فقط) — عرض المستخدمين وإنشاء مستخدم بأي دور.
@@ -392,9 +408,11 @@ React + TypeScript + Vite، مصمَّمة باستخدام **Tailwind CSS v4** 
 - `Tickets` (`/tickets`) — "المستخدم" يرى تذاكره فقط ("تذاكري")؛
   "الفني"/"المسؤول" يريان كل التذاكر ("قائمة انتظار التذاكر"). النقر على
   صف يفتح صفحة تفاصيل التذكرة.
-- `TicketDetail` (`/tickets/:id`) — تفاصيل المشكلة، زر "تعيين لي" وأداة
-  تغيير الحالة (للفنيين فقط)، سجل الحالات، وسلسلة التعليقات (يمكن للفني
-  وضع علامة "داخلي" على تعليق فلا يراه مُبلّغ التذكرة).
+- `TicketDetail` (`/tickets/:id`) — تفاصيل المشكلة، سجل الحالات، وسلسلة
+  التعليقات (يمكن للفني وضع علامة "داخلي" على تعليق فلا يراه مُبلّغ
+  التذكرة). يرى "الفني" إضافيًا زر "تعيين لي" وأداة تغيير الحالة وخانة
+  التعليق الداخلي؛ بينما يرى "المسؤول" بدلاً من ذلك أداة "إعادة تعيين"
+  لتوجيه التذكرة إلى فني محدد — بما يعكس فصل المهام في الواجهة الخلفية.
 - `KnowledgeBase` (`/knowledge-base`) — قائمة قابلة للبحث تضم كل المقالات
   الأربعين المعتمدة.
 - `Login` / `Register` (`/login`، `/register`) — صفحة الدخول تعرض بريد كل
@@ -444,6 +462,10 @@ npm run dev
   console المتصفح في كل مرة.
 - تم قياس دقة الاسترجاع والتصنيف مقابل مجموعة التقييم المحجوزة فعليًا،
   وليس افتراضًا.
+- تم التحقق من فصل المهام بين المسؤول والفني (إعادة التعيين مقابل الحل)
+  فعليًا عبر المتصفح: قيام مسؤول بإعادة تعيين تذكرة لفني
+  (`PATCH /api/tickets/{id}/reassign`، استجابة 200)، ثم تحقق أن ذلك الفني
+  يرى أدوات الحل (تعيين/تغيير الحالة/تعليق داخلي) التي لا يملكها المسؤول.
 
 ## ٩. ما لم يُبنَ بعد (بصراحة)
 
